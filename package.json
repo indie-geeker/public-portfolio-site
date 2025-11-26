@@ -1,0 +1,26 @@
+{
+  "name": "rico-blog-template",
+  "author": "Indie Geeker",
+  "description": "Astro.js Project",
+  "website": "https://indiegeeker.com/",
+  "repository": "https://github.com/ricocc/public-portfolio-site",
+  "license": "MIT",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "0.9.5",
+    "@astrojs/mdx": "4.3.12",
+    "@astrojs/rss": "4.0.14",
+    "@astrojs/sitemap": "3.6.0",
+    "astro": "5.16.0",
+    "sass": "^1.94.2",
+    "typescript": "^5.9.3"
+  }
+}
