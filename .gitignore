@@ -82,3 +82,7 @@ coverage/
 *.swo
 *~
 .history/
+
+CLAUDE.md
+AGENTS.md
+.agent/

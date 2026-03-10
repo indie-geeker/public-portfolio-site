@@ -24,8 +24,48 @@ keywords = {homeTdk.keywords  || ''}
 			<Cards />
 		</div>
 	</div>
+	<div class="section footer-cta">
+		<div class="container text-center">
+			<h2 class="cta-title">已有开发想法？</h2>
+			<p class="cta-desc">期待沟通并共同构建激动人心的产品。</p>
+			<a href="mailto:hello@example.com" class="button cta-button">联系沟通</a>
+		</div>
+	</div>
 
 </BaseLayout>
+
+<style lang="scss">
+.hero {
+	padding-top: 4vh;
+	padding-bottom: 2vh;
+}
+.footer-cta {
+    padding: 80px 0 120px;
+    margin-top: 60px;
+    border-top: 1px dashed var(--border);
+    .cta-title {
+        font-size: var(--text-3xl);
+        margin-bottom: 16px;
+        color: var(--color-100);
+    }
+    .cta-desc {
+        font-size: var(--text-base);
+        color: var(--color-400);
+        margin-bottom: 32px;
+    }
+    .cta-button {
+        background-color: var(--color-primary-main);
+        color: #fff;
+        border-radius: var(--button-rounded-full);
+        font-weight: 500;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        &:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    }
+}
+</style>
 
 
 

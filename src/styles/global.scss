@@ -87,7 +87,7 @@
     /* dark mode */
     --color-0: #000;
     --color-50: #0a0a0a;
-    --color-100: #101010;
+    --color-100: #09090b;
     --color-200: #303030;
     --color-300: #505050;
     --color-400: #707070;
@@ -98,8 +98,8 @@
     --color-900: #f9f8f7;
     --color-999-basis: 0, 0%, 100%;
     --color-999_40: hsla(var(--color-999-basis), 0.4);
-    --color-999: #f9f8f7;
-    --color-999-rgb: 249, 248, 247;
+    --color-999: #fafafa;
+    --color-999-rgb: 250, 250, 250;
     /* Colors */
     --accent-light: #808080;
     --accent-regular: #404040;
@@ -117,7 +117,7 @@
     --color-white-rgb: 255, 255, 255;
     --color-primary-lighter: #e0ecfd;
     --color-primary-light: #73abf9;
-    --color-primary-main: #499ad5;
+    --color-primary-main: #2563eb;
     --color-purple: #6127ff;
     --color-blue: #499ad5;
     --color-cyan: #00d0ff;
@@ -298,6 +298,7 @@ img {
     height: auto;
     pointer-events: none;
     -webkit-user-select: none;
+    user-select: none;
     -webkit-user-drag: none;
 }
 
@@ -483,18 +484,21 @@ body {
 
 /* 移动端隐藏 html 和 body 的滚动条 */
 @media (max-width: 767px) {
-	html,
-	body {
-		&::-webkit-scrollbar {
-			width: 3px !important;
-		}
-	}
-	* {
-		&::-webkit-scrollbar {
-			width: 3px;
-		}
-	}
+
+    html,
+    body {
+        &::-webkit-scrollbar {
+            width: 3px !important;
+        }
+    }
+
+    * {
+        &::-webkit-scrollbar {
+            width: 3px;
+        }
+    }
 }
+
 /*------------------------------------------------------------------
 	 #common base class  style
 	-------------------------------------------------------------------*/
@@ -512,6 +516,10 @@ body {
 
 .inline-block {
     display: inline-block;
+}
+
+.transition-fast {
+    transition: all 0.2s ease-in-out;
 }
 
 .pointer-none {
