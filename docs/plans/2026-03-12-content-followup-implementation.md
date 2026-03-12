@@ -1,0 +1,195 @@
+# Content Follow-Up Priorities Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Finish the highest-value follow-up work after the product-content migration by sealing article visibility rules, fixing RSS correctness, wiring true featured-article editorial control, and then paying down the remaining compatibility and build-hint debt.
+
+**Architecture:** Reuse the new content-query layer as the single source of truth for content visibility across homepage, blog pages, RSS, and future sitemap logic. Execute the work in priority order: first fix correctness leaks, then complete content operations for articles, then retire the remaining legacy product-detail compatibility layer, and only after that pay down schema and build-hint cleanup.
+
+**Tech Stack:** Astro 5, MDX content collections, TypeScript, Node `node:test`, pnpm
+
+---
+
+### Task 1: Seal blog visibility rules and fix RSS correctness
+
+**Files:**
+- Create: `tests/blog-feed.test.mjs`
+- Modify: `src/pages/blog/[...slug].astro`
+- Modify: `src/pages/rss.xml.js`
+- Modify: `src/data/content-queries.ts`
+
+**Step 1: Write the failing regression test**
+
+Create `tests/blog-feed.test.mjs` with assertions that:
+- hidden template posts are not built as public blog detail routes
+- RSS excludes hidden template posts and future `draft` entries
+- RSS uses `publishDate`, not the nonexistent `pubDate`
+
+**Step 2: Run the new test and verify it fails**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/blog-feed.test.mjs`
+
+Expected: FAIL because [`src/pages/blog/[...slug].astro`](/Users/wen/Desktop/Personal/Projects/public-portfolio-site/src/pages/blog/[...slug].astro) still generates routes for all entries and [`src/pages/rss.xml.js`](/Users/wen/Desktop/Personal/Projects/public-portfolio-site/src/pages/rss.xml.js) still maps raw collection entries with `pubDate`.
+
+**Step 3: Implement the minimal fix**
+
+Update the blog detail route to generate paths only for visible blog entries by reusing the shared query layer or a shared visibility helper. Update RSS to read from the same visible-entry query and map `publishDate`.
+
+**Step 4: Re-run the test**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/blog-feed.test.mjs`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add tests/blog-feed.test.mjs src/pages/blog/[...slug].astro src/pages/rss.xml.js src/data/content-queries.ts
+git commit -m "fix: align blog routes and rss with visibility rules"
+```
+
+### Task 2: Turn featured articles into an editorial workflow
+
+**Files:**
+- Modify: `src/content/blog/css-text-gradient-showcase-and-how-to-code/index.mdx`
+- Modify: `src/content/blog/article-template.md`
+- Modify: `src/content/blog/chinese-article-template.md`
+- Modify: `src/pages/index.astro`
+- Modify: `src/components/home/LatestNotes.astro`
+- Test: `tests/homepage.test.mjs`
+
+**Step 1: Write the failing homepage expectation**
+
+Extend `tests/homepage.test.mjs` so the homepage featured-article section asserts against explicit featured-entry output rather than merely the existence of the updates section.
+
+**Step 2: Run the homepage test and verify it fails**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/homepage.test.mjs`
+
+Expected: FAIL because no real article entry is currently marked as featured and the template frontmatter does not document the new editorial fields.
+
+**Step 3: Implement the minimal content and template changes**
+
+Add `featured: true` and `featuredOrder` to the current published article entry, and update both article templates so future posts include:
+
+```yaml
+featured: false
+featuredOrder: 999
+draft: false
+```
+
+Only change homepage code if the current test needs a stronger stable hook.
+
+**Step 4: Re-run the homepage test**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/homepage.test.mjs`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add src/content/blog/css-text-gradient-showcase-and-how-to-code/index.mdx src/content/blog/article-template.md src/content/blog/chinese-article-template.md src/pages/index.astro src/components/home/LatestNotes.astro tests/homepage.test.mjs
+git commit -m "feat: add editorial featured article workflow"
+```
+
+### Task 3: Retire the legacy product-detail compatibility layer
+
+**Files:**
+- Modify: `src/content/projects/free-3d-valentines-assets/index.mdx`
+- Modify: `src/content/projects/todo/index.mdx`
+- Modify: `src/content/projects/tinklife/index.mdx`
+- Modify: `src/pages/detail/[slug].astro`
+- Modify: `src/components/ProjectList.astro`
+- Modify: `src/content/config.ts`
+- Delete: `src/pages/detail/free-3d-valentines-assets.astro`
+- Delete: `src/pages/detail/todo.astro`
+- Delete: `src/pages/detail/tinklife.astro`
+- Modify: `tests/projects.test.mjs`
+
+**Step 1: Write the failing detail-route test**
+
+Extend `tests/projects.test.mjs` so it expects `/detail/todo/`, `/detail/tinklife/`, and `/detail/free-3d-valentines-assets/` to be generated by the dynamic route, not by compatibility `detailUrl` frontmatter.
+
+**Step 2: Run the test and verify it fails**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/projects.test.mjs`
+
+Expected: FAIL because those entries still rely on `detailUrl` and the static pages still exist.
+
+**Step 3: Implement the migration**
+
+Move the remaining descriptive content from the hand-written Astro pages into the MDX entries, remove `detailUrl` from those entries, teach the shared dynamic detail template to render any extra gallery or CTA content needed, and then delete the old static detail pages. Remove `detailUrl` from the `projects` schema when no entries need it anymore.
+
+**Step 4: Re-run the project test**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/projects.test.mjs`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add src/content/projects src/pages/detail/[slug].astro src/components/ProjectList.astro src/content/config.ts tests/projects.test.mjs
+git add -u src/pages/detail
+git commit -m "refactor: retire legacy project detail pages"
+```
+
+### Task 4: Co-locate project media and strengthen image typing
+
+**Files:**
+- Modify: `src/content/config.ts`
+- Modify: `src/content/projects/*/index.mdx`
+- Modify: `src/components/ProjectList.astro`
+- Modify: `src/pages/detail/[slug].astro`
+- Create: `src/content/projects/*/<media files>`
+
+**Step 1: Write the failing image-path regression**
+
+Add assertions to `tests/projects.test.mjs` that project cards and project detail pages still emit image tags after media moves out of `public/assets` and `src/assets/projects`.
+
+**Step 2: Run the test and verify it fails**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/projects.test.mjs`
+
+Expected: FAIL once the media-path assumptions in the current components no longer match the future colocated layout.
+
+**Step 3: Implement the schema and media migration**
+
+Adopt Astro content-image validation for `cover` and, if needed, a typed gallery field. Move each project’s media into its own content folder and update the list/detail components to render those validated image references instead of stringly typed asset paths.
+
+**Step 4: Re-run the project test**
+
+Run: `FORCE_TEST_BUILD=1 node --test --test-concurrency=1 tests/projects.test.mjs`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add src/content/config.ts src/content/projects src/components/ProjectList.astro src/pages/detail/[slug].astro tests/projects.test.mjs
+git commit -m "refactor: co-locate project media with content entries"
+```
+
+### Task 5: Clean the remaining build hints
+
+**Files:**
+- Modify: `src/components/functions/Analytics.astro`
+- Test: `pnpm build`
+
+**Step 1: Make the scripts explicit**
+
+Add `is:inline` to the analytics scripts so Astro stops emitting the inline-processing hints for [`src/components/functions/Analytics.astro`](/Users/wen/Desktop/Personal/Projects/public-portfolio-site/src/components/functions/Analytics.astro).
+
+**Step 2: Run the full build**
+
+Run: `pnpm build`
+
+Expected: PASS with the analytics-related hints removed. Any remaining hint should only be from code you intentionally deferred.
+
+**Step 3: Commit**
+
+```bash
+git add src/components/functions/Analytics.astro
+git commit -m "chore: clean analytics script build hints"
+```
