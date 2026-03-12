@@ -1,66 +1,69 @@
 ---
 import Filter from '../components/Filter.astro';
-// 引入 JSON 文件并加载数据
-// const cardJsonString = '/assets/data/card.json';
-// const cardData = JSON.parse(cardJsonString);
-// 使用 JSON 数据
-// import cardData from '../components/card.json';
 import cardData from '../data/home.json';
-const cards = [];
-for (const [index,item] of cardData.entries()) {
-  const card = {
+import { isExternalHref } from '../data/site-utils';
+
+const fallbackHref = 'javascript:void(0)';
+const cards = cardData.map((item, index) => {
+  const detail = item.detail || '';
+  const url = item.url || '';
+
+  return {
     id: item.id || index,
     title: item.title,
     cover: item.cover || "",
     description: item.desc || "",
-    url: item.url || "",
-    detail: item.detail || "",
-    category: item.category || "other",
+    url,
+    urlHref: url || fallbackHref,
+    urlIsExternal: isExternalHref(url),
+    detail,
+    detailHref: detail || fallbackHref,
+    detailIsExternal: isExternalHref(detail),
+    category: item.category ? item.category.split(',') : ["other"],
     tag: item.tag || "",
     date: item.date || "",
-    mark: item.mark|| "",
+    mark: item.mark || "",
     index: index + 1,
   };
-  cards.push(card);
-}
-// const cardFullData= JSON.stringify(cards);
+}).reverse();
+
 const count = cards.length;
 ---
 <Filter count={count} />
 <div class="section card">
     <div class="js-shuffle-sizer" >
         <div class="card-list my-shuffle-container" id="js-shuffle">
-            {cards.reverse().map((card) => (
-              <div class="card-item col-xs-1a col-md-2a col-lg-3a col-xxl-4a" data-groups={JSON.stringify(card.category)} data-date-created={card.date} data-title={card.title}>
-                  <div class="card-header">
+	            {cards.map((card) => (
+	              <div class="card-item col-xs-1a col-md-2a col-lg-3a col-xxl-4a" data-groups={JSON.stringify(card.category)} data-date-created={card.date} data-title={card.title}>
+	                  <div class="card-header">
                       <div class="card-type type">
                           <span class="type-tag">- {card.tag} - </span>
                       </div>
                       <div class="card-type type">
                           <span class="type-tag">(0{card.index})</span>
                       </div>
-                  </div>
-                  <div class="card-body">
-                      <a href={card.detail ? card.detail:"javascript:void(0)"} class="card-figure" target={card.detail ? "_blank":"_self"}>
-                        <img class="card-figure__img lazy"
-                              src={card.cover} loading="lazy"
-                              alt={card.title}
+	                  </div>
+	                  <div class="card-body">
+	                      <a href={card.detailHref} class="card-figure" target={card.detailIsExternal ? "_blank" : undefined} rel={card.detailIsExternal ? "noreferrer" : undefined}>
+	                        <img class="card-figure__img lazy"
+	                              src={card.cover} loading="lazy"
+	                              alt={card.title}
                         />
                       </a>
                   </div>
-                  <div class="card-footer">
-                      <div class="card-detail">
-                          <a href={card.detail ? card.detail :"javascript:void(0)"} target={card.detail ? "_blank":"_self"} class="card-name card-item__title">
-                            {card.mark && <span class="tag-original">推荐</span>}   {card.title}
-                          </a>
-                          <div class="card-info">
-                            {card.description}
-                          </div>
-                      </div>
-                     {card.url && <a href={card.url ? card.url : "javascript:void(0)" } class="card-link card-link__go js-gotip" target={card.url ? "_blank" : "_self"}>
-                      </a> }
-                  </div>
-              </div>
+	                  <div class="card-footer">
+	                      <div class="card-detail">
+	                          <a href={card.detailHref} target={card.detailIsExternal ? "_blank" : undefined} rel={card.detailIsExternal ? "noreferrer" : undefined} class="card-name card-item__title">
+	                            {card.mark && <span class="tag-original">推荐</span>}   {card.title}
+	                          </a>
+	                          <div class="card-info">
+	                            {card.description}
+	                          </div>
+	                      </div>
+	                     {card.url && <a href={card.urlHref} class="card-link card-link__go js-gotip" target={card.urlIsExternal ? "_blank" : undefined} rel={card.urlIsExternal ? "noreferrer" : undefined}>
+	                      </a> }
+	                  </div>
+	              </div>
               ))}
         </div>
         <div class="col-sm-1 col-xs-1 my-sizer-element" id="my-sizer-element"></div>
@@ -68,31 +71,19 @@ const count = cards.length;
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-      // 检查是否存在带有类名 '.card-figure__video' 的元素
-      const videos = document.querySelectorAll('.card-figure__video') as NodeListOf<HTMLVideoElement>;;
+      const videos = document.querySelectorAll('.card-figure__video') as NodeListOf<HTMLVideoElement>;
+      if (videos.length === 0) return;
 
-      // 如果存在视频元素，则执行相关操作
-      if (videos.length > 0) {
-          videos.forEach(video => {
-              // 设置自动播放
-              video.autoplay = true;
-              // 禁止声音
-              video.muted = true;
-              // 循环播放
-              video.loop = true;
-              // 隐藏控制栏（包括进度条、播放/停止按钮和菜单栏）
-              video.controls = false;
-              // 设置 playsinline 属性，以确保在移动设备上也能自动播放
-              video.setAttribute('playsinline', '');
-              // 为了确保视频开始播放，我们可以添加一个 play() 调用
-              video.play().catch(e => {
-                  console.log("Auto-play was prevented:", e);
-                  // 一些浏览器可能会阻止自动播放，特别是在没有用户交互的情况下
-              });
+      videos.forEach(video => {
+          video.autoplay = true;
+          video.muted = true;
+          video.loop = true;
+          video.controls = false;
+          video.setAttribute('playsinline', '');
+          video.play().catch(e => {
+              console.log("Auto-play was prevented:", e);
           });
-      } else {
-
-      }
+      });
   });
 </script>
 
@@ -389,5 +380,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 </style>
-
-

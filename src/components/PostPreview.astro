@@ -1,9 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { formatIsoDate } from '../data/site-utils';
+
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
 const { data, slug } = Astro.props.post;
+const publishDate = formatIsoDate(data.publishDate);
+const tags = data.tags?.slice(0, 3) ?? [];
 ---
 
 <a href={`/blog/${slug}`} class="post-item border-bottom">
@@ -11,10 +15,18 @@ const { data, slug } = Astro.props.post;
 		<h3>
 			{data.title}
 		</h3>
-		<span class="publish-date">
-			{data.publishDate.toISOString().split('T')[0]}
-		</span>
-		
+		<div class="post-meta">
+			<span class="publish-date">
+				{publishDate}
+			</span>
+			{data.read && <span class="post-read">{data.read} min</span>}
+		</div>
+		{data.description && <p class="post-desc">{data.description}</p>}
+		{tags.length > 0 && (
+			<div class="post-tags">
+				{tags.map((tag) => <span>{tag}</span>)}
+			</div>
+		)}
 	</div>
 	<div class="post-icon">
 		<div class="icon">
@@ -64,10 +76,41 @@ const { data, slug } = Astro.props.post;
 			position: relative;
 			word-break: break-word;
 			word-wrap: break-word;
+			max-width: 48rem;
 			h3{
 				line-height:1.3em;
 				text-align: left;
 				color:var(--color-100)
+			}
+		}
+		&-meta{
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+			margin-top: 0.55rem;
+		}
+		&-read{
+			font-size:0.875rem;
+			color:var(--color-500);
+			font-weight: 400;
+		}
+		&-desc{
+			margin: 0.65rem 0 0;
+			font-size: 0.95rem;
+			line-height: 1.75;
+			color: var(--color-300);
+		}
+		&-tags{
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.45rem;
+			margin-top: 0.8rem;
+			span{
+				padding: 0.3rem 0.55rem;
+				border-radius: 999px;
+				border: 1px solid var(--color-700);
+				font-size: 0.78rem;
+				color: var(--color-400);
 			}
 		}
 		&-icon{
@@ -108,7 +151,6 @@ const { data, slug } = Astro.props.post;
 	.publish-date{
 		font-size:0.875rem;
 		color:var(--color-500);
-		margin:0.5rem 0 0;
 		font-weight: 400;
 	}
 </style>

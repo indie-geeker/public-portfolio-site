@@ -1,15 +1,14 @@
 ---
-
-
 import { getCollection } from 'astro:content';
 import BlogPostLayout from "../layouts/BlogPostLayout.astro";
 import SectionHeader from "../components/SectionHeader.astro";
 import PostPreview from '../components/PostPreview.astro';
-import {pageTag, pageDescription,blogTdk} from '../data/content';
+import { pageTag, pageDescription, blogTdk } from '../data/content';
+import { isVisibleBlogPost, sortBlogPostsByDateDesc } from '../data/site-utils';
 
-const projects = (await getCollection('blog')).sort(
-	(a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
-);
+const posts = (await getCollection('blog'))
+	.filter(isVisibleBlogPost)
+	.sort(sortBlogPostsByDateDesc);
 ---
 
 <BlogPostLayout
@@ -31,8 +30,8 @@ const projects = (await getCollection('blog')).sort(
 				<div class="posts">
 					<div class="posts-container">
 						{
-							projects.map((project) => (
-								<PostPreview post={project} />
+							posts.map((post) => (
+								<PostPreview post={post} />
 							))
 						}
 					</div>

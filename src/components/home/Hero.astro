@@ -1,0 +1,688 @@
+---
+import { homeHero } from '../../data/homepage';
+import { nav, socialLinks } from '../../data/content';
+---
+
+<section class="home-hero">
+  <div class="hero-mesh-bg" aria-hidden="true">
+    <div class="mesh-orb mesh-orb-1"></div>
+    <div class="mesh-orb mesh-orb-2"></div>
+    <div class="mesh-orb mesh-orb-3"></div>
+    <div class="mesh-orb mesh-orb-4"></div>
+    <canvas id="hero-fluid-canvas"></canvas>
+  </div>
+  <div class="container hero-container">
+    <div class="hero-shell">
+      <div class="hero-content">
+        <h1 class="hero-greeting">
+          <span class="greeting-text">
+            {homeHero.greeting}
+            <svg class="greeting-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2-2v0a2 2 0 0 0-2-2v0a2 2 0 0 0-2-2v5"/><path d="M22 14c0 4.4-3.6 8-8 8H9.5c-2.8 0-5.5-1.5-7-4l-1-2c-.5-1-1-2.5-1-4 0-1.7 1.3-3 3-3s3 1.3 3 3v2"/><path d="M14 11V9a2 2 0 0 0-2-2"/></svg>
+          </span>
+          <br/>
+          <span class="typewriter-text" data-words={JSON.stringify(homeHero.typewriter)}></span><span class="typewriter-cursor">|</span>
+        </h1>
+        <p class="hero-summary">{homeHero.summary}</p>
+        <div class="hero-actions">
+          <a href={homeHero.primaryAction.href} class="hero-button hero-button--primary">
+            <span>{homeHero.primaryAction.label}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <div class="hero-socials">
+            {socialLinks.map((link) => (
+              <a href={link.url} target="_blank" rel="noopener noreferrer" class="hero-social-link" title={link.name} set:html={link.icon} />
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-avatar-wrap">
+        <div class="avatar-glow"></div>
+        <figure class="hero-avatar js-hero-avatar">
+          <img
+            src={nav.avatar}
+            alt="独立极客头像"
+            loading="eager"
+            decoding="async"
+            draggable="false"
+          />
+        </figure>
+      </div>
+    </div>
+    <div class="hero-nav-avatar-sentinel" data-nav-avatar-sentinel aria-hidden="true"></div>
+  </div>
+</section>
+
+<script is:inline>
+  class Typewriter {
+    constructor(spanElement, words, wait = 3000) {
+      this.spanElement = spanElement;
+      this.words = words;
+      this.txt = '';
+      this.wordIndex = 0;
+      this.wait = parseInt(wait, 10);
+      this.type();
+      this.isDeleting = false;
+    }
+
+    type() {
+      const current = this.wordIndex % this.words.length;
+      const fullTxt = this.words[current];
+
+      if (this.isDeleting) {
+        this.txt = fullTxt.substring(0, this.txt.length - 1);
+      } else {
+        this.txt = fullTxt.substring(0, this.txt.length + 1);
+      }
+
+      this.spanElement.innerHTML = `<span>${this.txt}</span>`;
+
+      let typeSpeed = 100;
+      if (this.isDeleting) {
+        typeSpeed /= 2;
+      }
+
+      if (!this.isDeleting && this.txt === fullTxt) {
+        typeSpeed = this.wait;
+        this.isDeleting = true;
+      } else if (this.isDeleting && this.txt === '') {
+        this.isDeleting = false;
+        this.wordIndex++;
+        typeSpeed = 500;
+      }
+
+      setTimeout(() => this.type(), typeSpeed);
+    }
+  }
+
+  const initHeroBehavior = () => {
+    if (window.__heroBehaviorInit) return;
+    window.__heroBehaviorInit = true;
+
+    const heroSection = document.querySelector('.home-hero');
+    const heroNavAvatarSentinel = document.querySelector('[data-nav-avatar-sentinel]');
+
+    // init Typewriter
+    const textSpan = document.querySelector('.typewriter-text');
+    if (textSpan) {
+      const words = JSON.parse(textSpan.getAttribute('data-words'));
+      if (words && words.length > 0) {
+        new Typewriter(textSpan, words, 2500);
+      }
+    }
+
+    // Reveal the sticky nav avatar only after the hero scrolls past the nav.
+    const navAvatarLink = document.querySelector('[data-nav-avatar]');
+    const navAvatar = navAvatarLink?.querySelector('.avatar');
+    const stickyNav = document.querySelector('nav');
+
+    if (navAvatarLink && navAvatar && heroNavAvatarSentinel) {
+      const updateNavAvatarVisibility = (shouldReveal) => {
+        navAvatarLink.classList.toggle('author--nav-avatar-hidden', !shouldReveal);
+        navAvatar.classList.toggle('avatar--revealed', shouldReveal);
+      };
+
+      const buildObserver = () => {
+        const navBottom = Math.round(stickyNav?.getBoundingClientRect().bottom ?? 88);
+
+        return new IntersectionObserver(
+          ([entry]) => {
+            updateNavAvatarVisibility(!entry?.isIntersecting);
+          },
+          {
+            threshold: 0,
+            rootMargin: `-${navBottom}px 0px 0px 0px`,
+          }
+        );
+      };
+
+      let navAvatarObserver = buildObserver();
+      navAvatarObserver.observe(heroNavAvatarSentinel);
+
+      const refreshNavAvatarObserver = () => {
+        navAvatarObserver.disconnect();
+        navAvatarObserver = buildObserver();
+        navAvatarObserver.observe(heroNavAvatarSentinel);
+      };
+
+      window.addEventListener('resize', refreshNavAvatarObserver);
+    }
+
+    // init Interactive Canvas Fluid Trail
+    const canvas = document.getElementById('hero-fluid-canvas');
+
+    if (heroSection && canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      const colors = ['#73abf9', '#1bc47d', '#f7d252', '#8B5CF6']; // Brand colors
+
+      const resize = () => {
+        width = heroSection.offsetWidth;
+        height = heroSection.offsetHeight;
+        canvas.width = width;
+        canvas.height = height;
+      };
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          // Random radius between 20 and 60
+          this.radius = Math.random() * 40 + 20;
+          this.color = colors[Math.floor(Math.random() * colors.length)];
+          // Minimal random velocity for drift
+          this.vx = (Math.random() - 0.5) * 2;
+          this.vy = (Math.random() - 0.5) * 2;
+          this.life = 1.0;
+          this.decay = Math.random() * 0.02 + 0.02; // How fast opacity drops
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.radius += 0.5; // Slightly expand over time
+          this.life -= this.decay;
+        }
+
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          // High blur and opacity based on life
+          ctx.fillStyle = this.color;
+          // We apply the opacity via globalAlpha before drawing
+          ctx.fill();
+        }
+      }
+
+      let rafId = null;
+
+      const animate = () => {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Use screen blend mode for glowing overlapping effect
+        ctx.globalCompositeOperation = 'screen';
+        // Add extreme blur to make it fluid-like
+        ctx.filter = 'blur(40px)';
+
+        for (let i = 0; i < particles.length; i++) {
+          let p = particles[i];
+          p.update();
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            i--;
+          } else {
+            ctx.globalAlpha = p.life * 0.6; // Max opacity 0.6
+            p.draw(ctx);
+          }
+        }
+
+        if (particles.length > 0) {
+          rafId = requestAnimationFrame(animate);
+        } else {
+          rafId = null;
+        }
+      };
+
+      heroSection.addEventListener('mousemove', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Spawn a couple of particles per mouse move event
+        for (let i = 0; i < 2; i++) {
+          particles.push(new Particle(x, y));
+        }
+
+        // Limit total particles to prevent huge performance drops
+        if (particles.length > 60) {
+          particles.splice(0, particles.length - 60);
+        }
+
+        if (!rafId) {
+          rafId = requestAnimationFrame(animate);
+        }
+      }, { passive: true });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroBehavior, { once: true });
+  } else {
+    initHeroBehavior();
+  }
+</script>
+
+<style lang="scss">
+  .home-hero {
+    position: relative;
+    padding: 6rem 0 4rem;
+    overflow: hidden;
+    min-height: calc(100vh - var(--size-top, 64px));
+    display: flex;
+    align-items: center;
+  }
+
+  @supports (min-height: 100svh) {
+    .home-hero {
+      min-height: calc(100svh - var(--size-top, 64px));
+    }
+  }
+
+  .home-hero > .container {
+    width: 100%;
+  }
+
+  .hero-shell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4rem;
+  }
+
+  .hero-content {
+    flex: 1;
+    max-width: 650px;
+    z-index: 10;
+  }
+
+  .hero-greeting {
+    margin: 0;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-100);
+  }
+
+  .greeting-text {
+    background: linear-gradient(90deg, #9D4EDD 0%, #E0AAFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .greeting-icon {
+    color: #9D4EDD;
+    -webkit-text-fill-color: initial;
+    display: inline-block;
+    transform-origin: 70% 70%;
+    animation: wave 2.5s infinite;
+  }
+
+  @keyframes wave {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+    60% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .typewriter-text {
+    color: var(--color-100);
+  }
+
+  .typewriter-cursor {
+    color: var(--color-100);
+    animation: blink 1s step-end infinite;
+    font-weight: 400;
+    margin-left: 2px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .hero-summary {
+    max-width: 42rem;
+    margin: 1.5rem 0 0;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--color-300);
+    font-family: var(--font-body);
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2.2rem;
+  }
+
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 148px;
+    padding: 0.95rem 1.8rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+
+  .hero-button--primary {
+    background: linear-gradient(90deg, #818CF8 0%, #D8B4FE 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px 0 rgba(168, 85, 247, 0.39);
+    border: none;
+    gap: 0.5rem;
+  }
+
+  .hero-button--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.65);
+    background: linear-gradient(90deg, #6366F1 0%, #C084FC 100%);
+  }
+
+  .hero-button--primary svg {
+    transition: transform 0.2s ease;
+  }
+
+  .hero-button--primary:hover svg {
+    transform: translateX(4px);
+  }
+
+  .hero-socials {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 1px solid var(--border);
+    color: var(--color-100);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  :root.theme-dark .hero-social-link {
+    background: var(--color-999);
+  }
+
+  .hero-social-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-300);
+  }
+
+  .hero-social-link :global(svg) {
+    width: 22px;
+    height: 22px;
+  }
+
+  .hero-avatar-wrap {
+    flex: 0 0 auto;
+    width: clamp(280px, 40vw, 420px);
+    height: clamp(280px, 40vw, 420px);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, rgba(236, 72, 153, 0.6) 40%, rgba(0, 212, 255, 0) 70%);
+    filter: blur(40px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.8;
+    animation: avatarPulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-glow {
+      animation: none !important;
+    }
+  }
+
+  @keyframes avatarPulse {
+    0%, 100% {
+      opacity: 0.8;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+  }
+
+  :root.theme-dark .avatar-glow {
+    opacity: 0.6;
+    animation: avatarPulseDark 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes avatarPulseDark {
+    0%, 100% {
+      opacity: 0.6;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+  }
+
+  .hero-avatar {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--color-white);
+    transition: opacity 0.24s ease, transform 0.24s ease;
+  }
+
+  .hero-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+
+  .hero-avatar.hero-avatar-hidden {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.86);
+  }
+
+  @media (max-width: 960px) {
+    .hero-shell {
+      flex-direction: column-reverse;
+      text-align: center;
+      gap: 3rem;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero-avatar-wrap {
+      width: clamp(220px, 60vw, 320px);
+      height: clamp(220px, 60vw, 320px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .home-hero {
+      padding: 3rem 0;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .hero-greeting {
+      font-size: clamp(2.5rem, 8vw, 3.5rem);
+    }
+  }
+
+  /* --- Interactive Mesh Gradient Background --- */
+  .hero-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-nav-avatar-sentinel {
+    width: 1px;
+    height: 1px;
+    margin-left: auto;
+    margin-right: auto;
+    pointer-events: none;
+  }
+
+  .hero-mesh-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+    background-color: var(--color-bg); /* Base background fallback */
+  }
+
+  #hero-fluid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Above the orbs, but below the content */
+    pointer-events: none;
+    mix-blend-mode: screen; /* Makes trailing layers pop against dark */
+  }
+
+  :root.theme-dark #hero-fluid-canvas {
+    mix-blend-mode: color-dodge;
+  }
+
+  .mesh-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    /* Use mix-blend-mode for vibrant overlap in light mode, subtle in dark mode */
+    mix-blend-mode: normal; 
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  :root.theme-dark .mesh-orb {
+    opacity: 0.4; /* Slightly dimmer in dark mode to not overpower text */
+    mix-blend-mode: screen; 
+  }
+
+  /* Specific Orb Configuration */
+  .mesh-orb-1 {
+    top: -10%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    max-width: 800px;
+    max-height: 800px;
+    background: radial-gradient(circle at center, #73abf9 0%, transparent 60%);
+    animation-name: floatOrb1;
+    animation-duration: 18s;
+  }
+
+  .mesh-orb-2 {
+    bottom: -10%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    max-width: 700px;
+    max-height: 700px;
+    background: radial-gradient(circle at center, #1bc47d 0%, transparent 60%);
+    animation-name: floatOrb2;
+    animation-duration: 22s;
+  }
+
+  .mesh-orb-3 {
+    top: 40%;
+    right: 15%;
+    width: 45vw;
+    height: 45vw;
+    max-width: 600px;
+    max-height: 600px;
+    background: radial-gradient(circle at center, #f7d252 0%, transparent 60%);
+    animation-name: floatOrb3;
+    animation-duration: 25s;
+  }
+
+  .mesh-orb-4 {
+    bottom: 20%;
+    left: 20%;
+    width: 40vw;
+    height: 40vw;
+    max-width: 500px;
+    max-height: 500px;
+    background: radial-gradient(circle at center, #8B5CF6 0%, transparent 60%);
+    animation-name: floatOrb4;
+    animation-duration: 15s;
+  }
+
+  /* Keyframe Animations */
+  @keyframes floatOrb1 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(10%, 15%) scale(1.1); }
+    100% { transform: translate(-5%, 5%) scale(0.95); }
+  }
+
+  @keyframes floatOrb2 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-15%, -10%) scale(0.9); }
+    100% { transform: translate(5%, -15%) scale(1.05); }
+  }
+
+  @keyframes floatOrb3 {
+    0% { transform: translate(0, 0) scale(1.05); }
+    50% { transform: translate(-10%, 15%) scale(0.95); }
+    100% { transform: translate(15%, -5%) scale(1.1); }
+  }
+
+  @keyframes floatOrb4 {
+    0% { transform: translate(0, 0) scale(0.95); }
+    50% { transform: translate(10%, -10%) scale(1.05); }
+    100% { transform: translate(-10%, 15%) scale(1); }
+  }
+
+  /* Disable animations if prefers-reduced-motion is enabled */
+  @media (prefers-reduced-motion: reduce) {
+    .mesh-orb {
+      animation: none !important;
+    }
+  }
+
+</style>

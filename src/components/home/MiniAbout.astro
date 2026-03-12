@@ -1,0 +1,83 @@
+---
+import { miniAbout } from '../../data/homepage';
+---
+
+<div class="mini-about">
+  <p class="mini-about__eyebrow font-type">{miniAbout.eyebrow}</p>
+  <div class="mini-about__content">
+    <div>
+      <h2 id="mini-about-heading">{miniAbout.title}</h2>
+      <p>{miniAbout.description}</p>
+    </div>
+    <a href={miniAbout.href} class="mini-about__link">{miniAbout.label}</a>
+  </div>
+</div>
+
+<style lang="scss">
+  .mini-about {
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 1.75rem;
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary-main) 18%, transparent), transparent 40%),
+      var(--color-white);
+  }
+
+  :root.theme-dark .mini-about {
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--color-primary-main) 18%, transparent), transparent 40%),
+      var(--color-999);
+  }
+
+  .mini-about__eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--color-400);
+    letter-spacing: 0.14em;
+    font-size: 0.8rem;
+  }
+
+  .mini-about__content {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .mini-about h2 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--color-100);
+  }
+
+  .mini-about p {
+    max-width: 48rem;
+    margin: 0.8rem 0 0;
+    color: var(--color-300);
+    line-height: 1.75;
+  }
+
+  .mini-about__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 148px;
+    padding: 0.95rem 1.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--color-100);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .mini-about__link:hover {
+    border-color: var(--color-primary-main);
+  }
+
+  @media (max-width: 900px) {
+    .mini-about__content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

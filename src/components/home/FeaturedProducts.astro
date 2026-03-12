@@ -1,0 +1,232 @@
+---
+import { featuredProducts, featuredProductsIntro } from '../../data/homepage';
+import { isExternalHref } from '../../data/site-utils';
+---
+
+<div class="featured-products">
+  <div class="featured-products__header">
+    <div>
+      <p class="featured-products__eyebrow font-type">{featuredProductsIntro.eyebrow}</p>
+      <h2 id="featured-products-heading">{featuredProductsIntro.title}</h2>
+      <p>{featuredProductsIntro.description}</p>
+    </div>
+    <a href="/project" class="featured-products__link">查看全部产品</a>
+  </div>
+  <div class="featured-products__grid">
+    {featuredProducts.map((product) => {
+      const isExternalLink = isExternalHref(product.href);
+
+      return (
+        <a 
+          href={product.href}
+          class="featured-card" 
+          style={`--featured-accent: ${product.accent};`}
+          target={isExternalLink ? '_blank' : undefined}
+          rel={isExternalLink ? 'noreferrer' : undefined}
+        >
+          <div class="featured-card__cover">
+            <img src={product.cover} alt={product.title} loading="lazy" />
+          </div>
+          <div class="featured-card__body">
+            <div class="featured-card__meta">
+              <span class="featured-card__status">{product.status}</span>
+              <div class="featured-card__tags">
+                {product.tags.map((tag) => <span>{tag}</span>)}
+              </div>
+            </div>
+            <h3>{product.title}</h3>
+            <p>{product.description}</p>
+            <span class="featured-card__link">
+              立即体验
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+<style lang="scss">
+  .featured-products__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .featured-products__header > div {
+    max-width: 42rem;
+  }
+
+  .featured-products__eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--color-400);
+    letter-spacing: 0.14em;
+    font-size: 0.8rem;
+  }
+
+  .featured-products__header h2 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--color-100);
+  }
+
+  .featured-products__header p {
+    margin: 0.8rem 0 0;
+    line-height: 1.75;
+    color: var(--color-300);
+  }
+
+  .featured-products__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 148px;
+    padding: 0.95rem 1.4rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--color-100);
+    white-space: nowrap;
+  }
+
+  .featured-products__link:hover {
+    border-color: var(--color-primary-main);
+  }
+
+  .featured-products__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .featured-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--color-white);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+  }
+
+  .featured-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    border-color: color-mix(in srgb, var(--featured-accent) 40%, var(--border));
+  }
+
+  :root.theme-dark .featured-card {
+    background: var(--color-999);
+  }
+
+  :root.theme-dark .featured-card:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .featured-card__cover {
+    display: block;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--featured-accent) 34%, transparent), transparent);
+    overflow: hidden;
+  }
+
+  .featured-card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .featured-card:hover .featured-card__cover img {
+    transform: scale(1.05);
+  }
+
+  .featured-card__body {
+    padding: 1.15rem;
+  }
+
+  .featured-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .featured-card__status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--featured-accent) 14%, transparent);
+    color: var(--color-100);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .featured-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: flex-end;
+  }
+
+  .featured-card__tags span {
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    background: var(--color-900);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--color-300);
+  }
+
+  :root.theme-dark .featured-card__tags span {
+    background: var(--color-800);
+  }
+
+  .featured-card h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--color-100);
+  }
+
+  .featured-card p {
+    margin: 0.8rem 0 1rem;
+    color: var(--color-300);
+    line-height: 1.75;
+  }
+
+  .featured-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-100);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .featured-card__link svg {
+    transition: transform 0.2s ease;
+  }
+
+  .featured-card:hover .featured-card__link svg {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 980px) {
+    .featured-products__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .featured-products__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

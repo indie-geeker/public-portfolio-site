@@ -83,6 +83,17 @@ coverage/
 *~
 .history/
 
+# AI & Agents
 CLAUDE.md
 AGENTS.md
 .agent/
+.agents/
+.codex/
+.cursor/
+.cursorrules
+.cline/
+.roo/
+.gemini/
+.windsurfrules
+
+docs/

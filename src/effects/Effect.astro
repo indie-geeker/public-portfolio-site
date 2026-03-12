@@ -1,12 +1,19 @@
 <canvas class="particle-canvas"></canvas>
 
 <script is:inline>
-	document.addEventListener('DOMContentLoaded', () => {
+	const initParticleEffect = () => {
+		if (window.__globalParticleEffectInit) return;
+		window.__globalParticleEffectInit = true;
+
 		const canvas = document.querySelector('.particle-canvas');
 		if (!canvas) return;
 		
 		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
 		let width, height;
+		let particleGateEnabled = true;
+		const inactivePointer = { x: -1000, y: -1000 };
 
 		// Handle high-DPI displays for sharper particles and correct coordinates
 		const setCanvasSize = () => {
@@ -22,18 +29,63 @@
 		setCanvasSize();
 
 		let particles = [];
-		let mouse = { x: -1000, y: -1000 };
-		let lastMouse = { x: -1000, y: -1000 };
+		let pointer = { ...inactivePointer };
+		let mouse = { ...inactivePointer };
+		let lastMouse = { ...inactivePointer };
 
 		window.addEventListener('resize', setCanvasSize);
 
+		const clearParticles = () => {
+			particles = [];
+			mouse = { ...inactivePointer };
+			lastMouse = { ...inactivePointer };
+			ctx.clearRect(0, 0, width, height);
+		};
+
+		const setParticleGateEnabled = (enabled) => {
+			if (particleGateEnabled === enabled) return;
+			particleGateEnabled = enabled;
+			if (!particleGateEnabled) {
+				clearParticles();
+			}
+		};
+
+		const syncParticleGate = () => {
+			const isHomepage = window.location.pathname === '/';
+			if (!isHomepage) {
+				setParticleGateEnabled(true);
+				return;
+			}
+
+			const heroSection = document.querySelector('.home-hero');
+			if (!heroSection) {
+				setParticleGateEnabled(true);
+				return;
+			}
+
+			const heroRect = heroSection.getBoundingClientRect();
+			const pointerInsideHero = (
+				pointer.x >= heroRect.left &&
+				pointer.x <= heroRect.right &&
+				pointer.y >= heroRect.top &&
+				pointer.y <= heroRect.bottom
+			);
+
+			setParticleGateEnabled(!pointerInsideHero);
+		};
+
 		const updateMouse = (e) => {
+			pointer.x = e.clientX || (e.touches && e.touches[0].clientX);
+			pointer.y = e.clientY || (e.touches && e.touches[0].clientY);
+			syncParticleGate();
+			if (!particleGateEnabled) return;
+
 			lastMouse.x = mouse.x;
 			lastMouse.y = mouse.y;
 			
 			// Always calculate relative to the viewport
-			mouse.x = e.clientX || (e.touches && e.touches[0].clientX);
-			mouse.y = e.clientY || (e.touches && e.touches[0].clientY);
+			mouse.x = pointer.x;
+			mouse.y = pointer.y;
 			
 			// Initialize lastMouse on first move to prevent long lines
 			if (lastMouse.x === -1000) {
@@ -113,7 +165,17 @@
 		
 		// Start animation loop
 		render();
-	});
+		syncParticleGate();
+		document.addEventListener('astro:page-load', syncParticleGate);
+		window.addEventListener('scroll', syncParticleGate, { passive: true });
+		window.addEventListener('resize', syncParticleGate);
+	};
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initParticleEffect, { once: true });
+	} else {
+		initParticleEffect();
+	}
 </script>
 
 <style>

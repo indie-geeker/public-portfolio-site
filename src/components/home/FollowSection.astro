@@ -1,0 +1,150 @@
+---
+import { followSection } from '../../data/homepage';
+---
+
+<div class="follow-section">
+  <div class="follow-section__header">
+    <p class="follow-section__eyebrow font-type">{followSection.eyebrow}</p>
+    <h2 id="follow-heading">{followSection.title}</h2>
+    <p>{followSection.description}</p>
+  </div>
+
+  <div class="follow-section__grid">
+    {followSection.entries.map((entry) => (
+      <a
+        href={entry.href}
+        class:list={['follow-entry', { 'follow-entry--placeholder': !entry.external }]}
+        target={entry.external ? '_blank' : undefined}
+        rel={entry.external ? 'noreferrer' : undefined}
+      >
+        <div class="follow-entry__top">
+          <span class="follow-entry__name">{entry.name}</span>
+          <span class="follow-entry__status">{entry.status}</span>
+        </div>
+        <p class="follow-entry__description">{entry.description}</p>
+        <span class="follow-entry__action">{entry.actionLabel}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style lang="scss">
+  .follow-section {
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 1.75rem;
+    background: var(--color-white);
+  }
+
+  :root.theme-dark .follow-section {
+    background: var(--color-999);
+  }
+
+  .follow-section__header {
+    max-width: 42rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .follow-section__eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--color-400);
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+  }
+
+  .follow-section__header h2 {
+    margin: 0;
+    color: var(--color-100);
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  .follow-section__header p {
+    margin: 0.85rem 0 0;
+    line-height: 1.75;
+    color: var(--color-300);
+  }
+
+  .follow-section__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .follow-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 100%;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: color-mix(in srgb, var(--color-white) 90%, transparent);
+    text-decoration: none;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  :root.theme-dark .follow-entry {
+    background: color-mix(in srgb, var(--color-999) 88%, transparent);
+  }
+
+  .follow-entry:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-main);
+  }
+
+  .follow-entry--placeholder {
+    background: transparent;
+  }
+
+  .follow-entry__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .follow-entry__name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-100);
+  }
+
+  .follow-entry__status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--color-400);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .follow-entry__description {
+    margin: 0;
+    color: var(--color-300);
+    line-height: 1.75;
+  }
+
+  .follow-entry__action {
+    margin-top: auto;
+    color: var(--color-100);
+    font-weight: 600;
+  }
+
+  @media (max-width: 1100px) {
+    .follow-section__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .follow-section {
+      padding: 1.25rem;
+    }
+
+    .follow-section__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

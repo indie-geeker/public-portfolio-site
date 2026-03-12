@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <filter id="glow-pink" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <circle cx="220" cy="100" r="4" fill="#6C38FF" opacity="0.3" />
+  <circle cx="580" cy="180" r="6" fill="#FF4785" opacity="0.4" />
+  <circle cx="250" cy="380" r="3" fill="#6C38FF" opacity="0.5" />
+
+  <g transform="translate(400, 150) rotate(-15)">
+    <rect x="-90" y="-30" width="90" height="60" rx="30" fill="none" stroke="#6C38FF" stroke-width="14" />
+    
+    <rect x="15" y="-30" width="90" height="60" rx="30" fill="none" stroke="#FF4785" stroke-width="14" filter="url(#glow-pink)" />
+    
+    <path d="M -5 -20 L 10 -35 M 0 0 L 15 0 M -5 20 L 10 35" stroke="#FF4785" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  <text x="400" y="300" font-family="system-ui, -apple-system, sans-serif" font-size="110" font-weight="900" fill="#6C38FF" text-anchor="middle" letter-spacing="4">404</text>
+
+  <text x="400" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#1A1A1A" text-anchor="middle">Oops! Link Broken</text>
+
+</svg>

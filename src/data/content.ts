@@ -1,28 +1,28 @@
 export const siteConfig = {
-    siteName: import.meta.env.PUBLIC_SITE_NAME,
-    siteUrl: import.meta.env.PUBLIC_SITE_URL,
+	siteName: import.meta.env.PUBLIC_SITE_NAME,
+	siteUrl: import.meta.env.PUBLIC_SITE_URL,
 }
 
 interface NavItem {
-    label: string;
-    href: string;
-    target?: string; // target是可选的，默认为_self或不指定
+	label: string;
+	href: string;
+	target?: string; // target是可选的，默认为_self或不指定
 }
 
 interface Nav {
-    avatar?: string;
-    items?: NavItem[]; // 使用数组来存储导航项，以便更灵活地添加或删除项
+	avatar?: string;
+	items?: NavItem[]; // 使用数组来存储导航项，以便更灵活地添加或删除项
 }
 
 // 定义导航项
 export const nav: Nav = {
-	avatar:'/assets/author.jpg',
-    items: [
-        { label: '首页', href: '/', target: '_self' },// target 为 '_blank' 打开新链接
-        { label: '项目', href: '/project', target: '_self' },
-        { label: '关于', href: '/about', target: '_self' },
-        { label: '博客', href: '/blog', target: '_self' },
-    ],
+	avatar: '/assets/author.jpg',
+	items: [
+		{ label: '首页', href: '/', target: '_self' },// target 为 '_blank' 打开新链接
+		{ label: '产品', href: '/project', target: '_self' },
+		{ label: '文章', href: '/blog', target: '_self' },
+		{ label: '关于', href: '/about', target: '_self' },
+	],
 };
 
 // Footer
@@ -37,26 +37,26 @@ interface SeoTdk {
 // SEO TDK 首页
 export const homeTdk: SeoTdk = {
 	title: '独立极客',
-	description: '独立极客的个人网站，记录我的一些想法和笔记',
-	keywords: '独立极客,博客'
+	description: '独立开发者产品实验室，持续发布数字产品、设计资源与创意实验。',
+	keywords: '独立极客,独立开发者,产品,设计资源,创意实验'
 }
 // SEO TDK 博客
 export const blogTdk: SeoTdk = {
-	title: '独立极客的博客',
-	description: '记录我的一些想法和笔记',
-	keywords: '独立极客,博客,blog'
+	title: '独立极客的更新',
+	description: '记录产品发布、版本迭代和创意实验的公开构建过程。',
+	keywords: '独立极客,更新,产品日志,build in public'
 }
 // SEO TDK 关于
 export const aboutTdk: SeoTdk = {
-	title: '独立极客的个人介绍',
-	description: '独立极客的个人介绍',
-	keywords: '独立极客,博客'
+	title: '关于独立极客',
+	description: '关于独立极客的品牌、产品方向与创作方式。',
+	keywords: '独立极客,独立开发者,关于'
 }
 // SEO TDK  项目
 export const projectTdk: SeoTdk = {
-	title: '独立极客的项目介绍',
-	description: '这是我的部分项目展示',
-	keywords: '独立极客,博客,project'
+	title: '独立极客的产品库',
+	description: '查看独立极客正在构建和维护的产品、资源与实验。',
+	keywords: '独立极客,产品,资源,实验'
 }
 // SEO TDK 404
 export const notFoundTdk: SeoTdk = {
@@ -125,10 +125,10 @@ interface PageTag {
 	project: string
 }
 export const pageTag: PageTag = {
-	index: 'PORTFOLIO',
+	index: 'PRODUCT LAB',
 	about: 'ABOUT',
-	blog: 'BLOG',
-	project: 'PROJECT'
+	blog: 'UPDATES',
+	project: 'PRODUCTS'
 }
 
 
@@ -140,10 +140,10 @@ interface PageDescription {
 	about?: string
 }
 export const pageDescription: PageDescription = {
-	index: '我是Leo，一个拥有超过10年经验的独立开发者，在这里可以了解更多关于我的信息，或者阅读我的一些文章和笔记。',
-	project: "这是我的部分项目展示",
-	about: '专注于产品、品牌、UI设计和视觉开发',
-	blog: '这是我的个人笔记和想法， 希望你能够获得帮助！',
+	index: '持续发布好用、有趣、能立刻上手的数字产品、行业资讯与开发经验。',
+	project: "查看独立极客正在构建与维护的产品、资源和实验。",
+	about: '围绕产品、创业与开发做持续发布。',
+	blog: '记录产品发布、版本迭代与公开构建的过程。',
 }
 
 
@@ -154,13 +154,10 @@ export interface FilterItem {
 	dataGroup: string
 }
 export const filterItems: FilterItem[] = [
-	{ content: "💎推荐", dataGroup: "recommend" },
-	{ content: "网页", dataGroup: "web" },
-	{ content: "UI", dataGroup: "ui" },
-	{ content: "3D", dataGroup: "3d" },
-	{ content: "摄影", dataGroup: "photography" },
-	{ content: "品牌", dataGroup: "brand" },
+	{ content: "精选", dataGroup: "featured" },
+	{ content: "产品", dataGroup: "product" },
+	{ content: "资源", dataGroup: "resource" },
+	{ content: "灵感", dataGroup: "inspiration" },
+	{ content: "实验", dataGroup: "experiment" },
 ];
-
-
 
