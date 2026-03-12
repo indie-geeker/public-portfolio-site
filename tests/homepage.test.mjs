@@ -7,6 +7,7 @@ import { join } from 'node:path';
 const cwd = process.cwd();
 const distDir = join(cwd, 'dist');
 const homepagePath = join(distDir, 'index.html');
+const aboutPagePath = join(distDir, 'about', 'index.html');
 
 function buildSite() {
   rmSync(distDir, { recursive: true, force: true });
@@ -36,6 +37,11 @@ test('homepage build includes product-led hero and follow section', () => {
   assert.match(html, /data-nav-avatar-sentinel/);
   assert.match(html, /updateNavAvatarVisibility/);
   assert.match(html, /IntersectionObserver/);
+  assert.match(html, /data-scroll-glass-nav/);
+  assert.match(html, /--nav-scroll-progress/);
+  assert.match(html, /window\.scrollY/);
+  assert.match(html, /document\.body\.scrollTop/);
+  assert.match(html, /hero-overlap/);
 });
 
 test('homepage build disables the global particle trail only while the pointer is inside the hero', () => {
@@ -48,4 +54,15 @@ test('homepage build disables the global particle trail only while the pointer i
   assert.match(html, /querySelector\(['"]\.home-hero['"]\)/);
   assert.match(html, /pointer\.x >= heroRect\.left/);
   assert.match(html, /pointer\.y <= heroRect\.bottom/);
+});
+
+test('shared nav build emits scroll-driven glass hooks on non-home pages', () => {
+  buildSite();
+  const html = readFileSync(aboutPagePath, 'utf8');
+
+  assert.match(html, /data-scroll-glass-nav/);
+  assert.match(html, /--nav-scroll-progress/);
+  assert.match(html, /window\.scrollY/);
+  assert.match(html, /document\.body\.scrollTop/);
+  assert.match(html, /nav--scrolled/);
 });

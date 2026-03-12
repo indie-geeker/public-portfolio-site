@@ -3,7 +3,7 @@ import { homeHero } from '../../data/homepage';
 import { nav, socialLinks } from '../../data/content';
 ---
 
-<section class="home-hero">
+<section class="home-hero" data-hero-overlap>
   <div class="hero-mesh-bg" aria-hidden="true">
     <div class="mesh-orb mesh-orb-1"></div>
     <div class="mesh-orb mesh-orb-2"></div>
@@ -258,8 +258,10 @@ import { nav, socialLinks } from '../../data/content';
 
 <style lang="scss">
   .home-hero {
+    --hero-overlap: clamp(5rem, 8vw, 6.5rem);
     position: relative;
-    padding: 6rem 0 4rem;
+    margin-top: calc(var(--hero-overlap) * -1);
+    padding: calc(6rem + var(--hero-overlap)) 0 4rem;
     overflow: hidden;
     min-height: calc(100vh - var(--size-top, 64px));
     display: flex;
@@ -536,7 +538,7 @@ import { nav, socialLinks } from '../../data/content';
 
   @media (max-width: 640px) {
     .home-hero {
-      padding: 3rem 0;
+      padding: calc(3rem + var(--hero-overlap)) 0 3rem;
     }
 
     .hero-actions {
@@ -565,7 +567,7 @@ import { nav, socialLinks } from '../../data/content';
 
   .hero-mesh-bg {
     position: absolute;
-    inset: 0;
+    inset: calc(var(--hero-overlap) * -1) 0 0;
     overflow: hidden;
     z-index: 0;
     pointer-events: none;
