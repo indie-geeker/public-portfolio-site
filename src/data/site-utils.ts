@@ -7,8 +7,8 @@ export const hiddenBlogSlugs = new Set([
   'chinese-article-template',
 ]);
 
-export const isVisibleBlogPost = (post: Pick<BlogEntry, 'slug'>) =>
-  !hiddenBlogSlugs.has(post.slug);
+export const isVisibleBlogPost = (post: Pick<BlogEntry, 'slug' | 'data'>) =>
+  !hiddenBlogSlugs.has(post.slug) && post.data.draft !== true;
 
 export const sortBlogPostsByDateDesc = (
   a: Pick<BlogEntry, 'data'>,

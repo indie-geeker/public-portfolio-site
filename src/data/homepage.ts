@@ -17,16 +17,6 @@ export interface HeroHighlight {
   label: string;
 }
 
-export interface FeaturedProduct {
-  title: string;
-  description: string;
-  href: string;
-  cover: string;
-  status: string;
-  tags: string[];
-  accent: string;
-}
-
 export const homeHero = {
   greeting: '你好 我是',
   typewriter: ['独立极客', '独立开发者', '产品创作者'],
@@ -43,36 +33,6 @@ export const featuredProductsIntro = {
   title: '精选产品',
   description: '近期发布或持续迭代的数字产品，包含工具、设计资源与创意实验。',
 };
-
-export const featuredProducts: FeaturedProduct[] = [
-  {
-    title: 'GradientsHub',
-    description: '一个面向设计师和开发者的高级渐变背景资源库，支持快速筛选与下载。',
-    href: 'https://gradientshub.com/?ref=portfolio',
-    cover: '/assets/cover/cover-gradientshub.jpg',
-    status: '已上线',
-    tags: ['产品', '设计资源'],
-    accent: '#73abf9',
-  },
-  {
-    title: 'UIUX 设计工具&资源库',
-    description: '把常用设计工具、灵感和收藏资源聚合成一个更适合日常检索的入口。',
-    href: 'https://uiuxdeck.com/?ref=portfolio',
-    cover: '/assets/cover/cover-uiuxdeck.jpg',
-    status: '持续更新',
-    tags: ['资源', '效率'],
-    accent: '#1bc47d',
-  },
-  {
-    title: 'Rico OG Gallery',
-    description: '围绕视觉灵感和封面素材整理的图库型产品，用于快速寻找可复用表达。',
-    href: 'https://og.ricoui.com/',
-    cover: '/assets/cover/cover-ricoog.jpg',
-    status: '实验中',
-    tags: ['实验', '灵感库'],
-    accent: '#f7d252',
-  },
-];
 
 export const latestNotesIntro = {
   eyebrow: 'FEATURED ARTICLES',

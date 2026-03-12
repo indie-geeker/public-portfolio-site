@@ -1,14 +1,27 @@
 ---
-import { projectItems } from "../data/project";
+import type { CollectionEntry } from 'astro:content';
 import ProjectImage from "../components/ProjectImage.astro";
-const reversedItems = projectItems.slice().reverse();
+
+interface Props {
+	projects: CollectionEntry<'projects'>[];
+}
+
+const { projects } = Astro.props;
+
 const images = import.meta.glob<{ default: ImageMetadata }>(
 	"/src/assets/projects/**/*.{jpeg,jpg,png,gif}",
 );
+
+const getProjectHref = (project: CollectionEntry<'projects'>) =>
+	project.data.detailUrl || `/detail/${project.slug}`;
 ---
 {
-	reversedItems.map((item) => (
-		<a href={item.detail} class="project-item border-bottom">
+	projects.map((project) => {
+		const gallery = project.data.gallery?.length ? project.data.gallery : [project.data.cover];
+		const href = getProjectHref(project);
+
+		return (
+		<a href={href} class="project-item border-bottom">
 			<div class="project-header">
 				<div class="project-title">
 					<h3>
@@ -39,9 +52,9 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 								<use xlink:href="#ai:local:stars" />
 							</>{" "}
 						</svg>{" "}
-						{item.title}
+						{project.data.title}
 					</h3>
-					{item.title_en && <p class="font-type">{item.title_en}</p>}
+					{project.data.title_en && <p class="font-type">{project.data.title_en}</p>}
 				</div>
 				<div class="project-icon">
 					<div class="icon">
@@ -60,36 +73,49 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 					</div>
 				</div>
 			</div>
-			{item.cover && (
+			{gallery.length > 0 && (
 				<div class="project-body">
 					<div class="project-cover">
-						{item.cover.map((figure) => {
+						{gallery.map((figure) => {
+							if (figure.startsWith('/')) {
+								return (
+									<div class="project-figure">
+										<img
+											class="project-figure__img"
+											src={figure}
+											alt={project.data.title}
+											loading="lazy"
+										/>
+									</div>
+								);
+							}
+
 							if (images[`/src/assets/projects/${figure}`]) {
-								// Check if the image exists
 								return (
 									<div class="project-figure">
 										<ProjectImage
 											imagePath={`/src/assets/projects/${figure}`}
-											altText="Loading"
+											altText={project.data.title}
 										/>
 									</div>
 								);
-							} else {
 							}
+
+							return null;
 						})}
 					</div>
 				</div>
 			)}
 			<div class="project-footer">
 				<div class="project-tags">
-					{item.tags?.map((tag) => (
+					{project.data.tags.map((tag) => (
 						<span class="tag">{tag}</span>
 					))}
 				</div>
-				<div class="project-date">{item.date?.split("-")[0]}</div>
+				<div class="project-date">{project.data.publishDate.toISOString().slice(0, 4)}</div>
 			</div>
 		</a>
-	))
+	)})
 }
 
 <style lang="scss">

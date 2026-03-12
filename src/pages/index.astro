@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import LatestNotes from "../components/home/LatestNotes.astro";
 import FeaturedProducts from "../components/home/FeaturedProducts.astro";
 import FollowSection from "../components/home/FollowSection.astro";
@@ -7,12 +6,10 @@ import Hero from "../components/home/Hero.astro";
 import MiniAbout from "../components/home/MiniAbout.astro";
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { homeTdk } from '../data/content';
-import { isVisibleBlogPost, sortBlogPostsByDateDesc } from '../data/site-utils';
+import { getFeaturedBlogPosts, getFeaturedProjects } from '../data/content-queries';
 
-const latestPosts = (await getCollection('blog'))
-  .filter(isVisibleBlogPost)
-  .sort(sortBlogPostsByDateDesc)
-  .slice(0, 3);
+const featuredProjects = await getFeaturedProjects(3);
+const featuredPosts = await getFeaturedBlogPosts(3);
 ---
 
 <BaseLayout
@@ -28,14 +25,14 @@ keywords={homeTdk.keywords || ''}
     data-particle-gate-start
   >
     <div class="container">
-      <FeaturedProducts />
+      <FeaturedProducts projects={featuredProjects} />
     </div>
   </section>
 
-  {latestPosts.length > 0 && (
+  {featuredPosts.length > 0 && (
     <section class="home-section" id="updates" aria-labelledby="latest-notes-heading">
       <div class="container">
-        <LatestNotes posts={latestPosts} />
+        <LatestNotes posts={featuredPosts} />
       </div>
     </section>
   )}

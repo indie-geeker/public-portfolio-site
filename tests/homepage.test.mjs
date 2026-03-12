@@ -1,25 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execSync } from 'node:child_process';
-import { readFileSync, rmSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { buildSite } from './helpers/build-site.mjs';
 
 const cwd = process.cwd();
 const distDir = join(cwd, 'dist');
 const homepagePath = join(distDir, 'index.html');
 const aboutPagePath = join(distDir, 'about', 'index.html');
-
-function buildSite() {
-  rmSync(distDir, { recursive: true, force: true });
-  execSync('pnpm build', {
-    cwd,
-    stdio: 'pipe',
-    env: { ...process.env, CI: '1' },
-  });
-}
+buildSite();
 
 test('homepage build includes product-led hero and follow section', () => {
-  buildSite();
   const html = readFileSync(homepagePath, 'utf8');
 
   assert.match(html, /独立极客/);
@@ -45,7 +36,6 @@ test('homepage build includes product-led hero and follow section', () => {
 });
 
 test('homepage build disables the global particle trail only while the pointer is inside the hero', () => {
-  buildSite();
   const html = readFileSync(homepagePath, 'utf8');
 
   assert.match(html, /data-particle-gate-start/);
@@ -57,7 +47,6 @@ test('homepage build disables the global particle trail only while the pointer i
 });
 
 test('shared nav build emits scroll-driven glass hooks on non-home pages', () => {
-  buildSite();
   const html = readFileSync(aboutPagePath, 'utf8');
 
   assert.match(html, /data-scroll-glass-nav/);

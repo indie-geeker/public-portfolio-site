@@ -3,6 +3,9 @@ import BlogPostLayout from "../layouts/BlogPostLayout.astro";
 import SectionHeader from "../components/SectionHeader.astro";
 import ProjectList from '../components/ProjectList.astro';
 import {pageTag, pageDescription,projectTdk} from '../data/content';
+import { getVisibleProjects } from '../data/content-queries';
+
+const projects = await getVisibleProjects();
 
 ---
 
@@ -24,7 +27,7 @@ import {pageTag, pageDescription,projectTdk} from '../data/content';
 			<section class="border-top">
 				<div class="posts">
 					<div class="posts-container">
-							<ProjectList  />
+							<ProjectList projects={projects} />
 					</div>
 				</div>
 			</section>

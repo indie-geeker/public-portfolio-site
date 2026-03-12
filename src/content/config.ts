@@ -9,9 +9,32 @@ const blogCollection =  defineCollection({
 			tags: z.array(z.string()).optional(),
 			img: z.string().optional(),
 			img_alt: z.string().optional(),
+			featured: z.boolean().optional().default(false),
+			featuredOrder: z.number().int().optional(),
+			draft: z.boolean().optional().default(false),
+		}),
+});
+
+const projectsCollection = defineCollection({
+		type: 'content',
+		schema: z.object({
+			title: z.string(),
+			title_en: z.string().optional(),
+			description: z.string(),
+			publishDate: z.coerce.date(),
+			status: z.string().optional(),
+			tags: z.array(z.string()).optional().default([]),
+			cover: z.string(),
+			gallery: z.array(z.string()).optional().default([]),
+			externalUrl: z.string().url().optional(),
+			detailUrl: z.string().optional(),
+			featured: z.boolean().optional().default(false),
+			featuredOrder: z.number().int().optional(),
+			draft: z.boolean().optional().default(false),
 		}),
 });
 
 export const collections = {
 	'blog': blogCollection,
+	'projects': projectsCollection,
 };

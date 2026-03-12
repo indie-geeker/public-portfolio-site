@@ -1,6 +1,13 @@
 ---
-import { featuredProducts, featuredProductsIntro } from '../../data/homepage';
+import type { CollectionEntry } from 'astro:content';
+import { featuredProductsIntro } from '../../data/homepage';
 import { isExternalHref } from '../../data/site-utils';
+
+interface Props {
+  projects: CollectionEntry<'projects'>[];
+}
+
+const { projects } = Astro.props;
 ---
 
 <div class="featured-products">
@@ -13,31 +20,33 @@ import { isExternalHref } from '../../data/site-utils';
     <a href="/project" class="featured-products__link">查看全部产品</a>
   </div>
   <div class="featured-products__grid">
-    {featuredProducts.map((product) => {
-      const isExternalLink = isExternalHref(product.href);
+    {projects.map((project) => {
+      const href = project.data.externalUrl || project.data.detailUrl || `/detail/${project.slug}`;
+      const isExternalLink = isExternalHref(href);
+      const status = project.data.status || '查看详情';
 
       return (
         <a 
-          href={product.href}
+          href={href}
           class="featured-card" 
-          style={`--featured-accent: ${product.accent};`}
+          style={`--featured-accent: var(--color-primary-main);`}
           target={isExternalLink ? '_blank' : undefined}
           rel={isExternalLink ? 'noreferrer' : undefined}
         >
           <div class="featured-card__cover">
-            <img src={product.cover} alt={product.title} loading="lazy" />
+            <img src={project.data.cover} alt={project.data.title} loading="lazy" />
           </div>
           <div class="featured-card__body">
             <div class="featured-card__meta">
-              <span class="featured-card__status">{product.status}</span>
+              <span class="featured-card__status">{status}</span>
               <div class="featured-card__tags">
-                {product.tags.map((tag) => <span>{tag}</span>)}
+                {project.data.tags.map((tag) => <span>{tag}</span>)}
               </div>
             </div>
-            <h3>{product.title}</h3>
-            <p>{product.description}</p>
+            <h3>{project.data.title}</h3>
+            <p>{project.data.description}</p>
             <span class="featured-card__link">
-              立即体验
+              {project.data.externalUrl ? '立即体验' : '查看详情'}
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </span>
           </div>
