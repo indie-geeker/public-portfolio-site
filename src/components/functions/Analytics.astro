@@ -14,8 +14,8 @@ if (!UMAMIId) {
 
 <!-- GA4 跟踪代码 -->
 {gaId && (
-    <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} ></script>
-    <script define:vars={{ gaId }}>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} ></script>
+    <script is:inline define:vars={{ gaId }}>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
@@ -26,6 +26,7 @@ if (!UMAMIId) {
 <!-- UMAMIId 跟踪代码 -->
 {UMAMIId && (
     <script
+        is:inline
         async
         defer
         data-website-id={UMAMIId}

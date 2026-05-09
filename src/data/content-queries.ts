@@ -1,7 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { hiddenBlogSlugs } from './site-utils';
+import { isVisibleBlogPost } from './site-utils';
 
-type BlogEntry = CollectionEntry<'blog'>;
 type ProjectEntry = CollectionEntry<'projects'>;
 
 type FeaturedEntryLike = {
@@ -46,15 +45,12 @@ export const selectFeaturedEntries = <T extends FeaturedEntryLike>(
   return [...explicitFeatured, ...fallbackEntries].slice(0, limit);
 };
 
-const isVisibleBlogEntry = (entry: BlogEntry) =>
-  entry.data.draft !== true && !hiddenBlogSlugs.has(entry.slug);
-
 const isVisibleProjectEntry = (entry: ProjectEntry) =>
   entry.data.draft !== true;
 
 export const getVisibleBlogPosts = async (limit?: number) => {
   const posts = (await getCollection('blog'))
-    .filter(isVisibleBlogEntry)
+    .filter(isVisibleBlogPost)
     .sort(sortByPublishDateDesc);
 
   return typeof limit === 'number' ? posts.slice(0, limit) : posts;

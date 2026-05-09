@@ -1,24 +1,17 @@
 ---
+import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import ProjectImage from "../components/ProjectImage.astro";
 
 interface Props {
 	projects: CollectionEntry<'projects'>[];
 }
 
 const { projects } = Astro.props;
-
-const images = import.meta.glob<{ default: ImageMetadata }>(
-	"/src/assets/projects/**/*.{jpeg,jpg,png,gif}",
-);
-
-const getProjectHref = (project: CollectionEntry<'projects'>) =>
-	project.data.detailUrl || `/detail/${project.slug}`;
 ---
 {
 	projects.map((project) => {
 		const gallery = project.data.gallery?.length ? project.data.gallery : [project.data.cover];
-		const href = getProjectHref(project);
+		const href = `/detail/${project.slug}`;
 
 		return (
 		<a href={href} class="project-item border-bottom">
@@ -77,31 +70,16 @@ const getProjectHref = (project: CollectionEntry<'projects'>) =>
 				<div class="project-body">
 					<div class="project-cover">
 						{gallery.map((figure) => {
-							if (figure.startsWith('/')) {
-								return (
-									<div class="project-figure">
-										<img
-											class="project-figure__img"
-											src={figure}
-											alt={project.data.title}
-											loading="lazy"
-										/>
-									</div>
-								);
-							}
-
-							if (images[`/src/assets/projects/${figure}`]) {
-								return (
-									<div class="project-figure">
-										<ProjectImage
-											imagePath={`/src/assets/projects/${figure}`}
-											altText={project.data.title}
-										/>
-									</div>
-								);
-							}
-
-							return null;
+							return (
+								<div class="project-figure">
+									<Image
+										class="project-figure__img"
+										src={figure}
+										alt={project.data.title}
+										loading="lazy"
+									/>
+								</div>
+							);
 						})}
 					</div>
 				</div>

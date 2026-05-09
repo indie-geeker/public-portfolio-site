@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildSite } from './helpers/build-site.mjs';
 
@@ -8,7 +8,44 @@ const cwd = process.cwd();
 const distDir = join(cwd, 'dist');
 const homepagePath = join(distDir, 'index.html');
 const aboutPagePath = join(distDir, 'about', 'index.html');
-buildSite();
+const editorialFixtureSlug = 'featured-articles-order-fixture';
+const editorialFixtureSourcePath = join(
+  cwd,
+  'src',
+  'content',
+  'blog',
+  `${editorialFixtureSlug}.md`,
+);
+const articleTemplatePath = join(cwd, 'src', 'content', 'blog', 'article-template.md');
+const chineseTemplatePath = join(
+  cwd,
+  'src',
+  'content',
+  'blog',
+  'chinese-article-template.md',
+);
+
+writeFileSync(
+  editorialFixtureSourcePath,
+  `---
+title: "Newest Non-Featured Article"
+description: "Visible fixture used to verify editorial featured ordering"
+publishDate: 2025-06-01
+featured: false
+featuredOrder: 999
+draft: false
+---
+
+This fixture should appear after explicitly featured entries on the homepage.
+`,
+  'utf8',
+);
+
+try {
+  buildSite();
+} finally {
+  rmSync(editorialFixtureSourcePath, { force: true });
+}
 
 test('homepage build includes product-led hero and follow section', () => {
   const html = readFileSync(homepagePath, 'utf8');
@@ -33,6 +70,31 @@ test('homepage build includes product-led hero and follow section', () => {
   assert.match(html, /window\.scrollY/);
   assert.match(html, /document\.body\.scrollTop/);
   assert.match(html, /hero-overlap/);
+});
+
+test('homepage featured articles prefer explicit featured entries over newer fallback posts', () => {
+  const html = readFileSync(homepagePath, 'utf8');
+  const featuredArticleIndex = html.indexOf('(MDX)网页CSS文字渐变精选');
+  const newestFallbackIndex = html.indexOf('Newest Non-Featured Article');
+
+  assert.notEqual(featuredArticleIndex, -1);
+  assert.notEqual(newestFallbackIndex, -1);
+  assert.ok(
+    featuredArticleIndex < newestFallbackIndex,
+    'expected explicitly featured article to render before newer non-featured content',
+  );
+});
+
+test('blog templates document editorial featured and draft frontmatter fields', () => {
+  const articleTemplate = readFileSync(articleTemplatePath, 'utf8');
+  const chineseTemplate = readFileSync(chineseTemplatePath, 'utf8');
+
+  assert.match(articleTemplate, /featured:\s*false/);
+  assert.match(articleTemplate, /featuredOrder:\s*999/);
+  assert.match(articleTemplate, /draft:\s*false/);
+  assert.match(chineseTemplate, /featured:\s*false/);
+  assert.match(chineseTemplate, /featuredOrder:\s*999/);
+  assert.match(chineseTemplate, /draft:\s*false/);
 });
 
 test('homepage build disables the global particle trail only while the pointer is inside the hero', () => {

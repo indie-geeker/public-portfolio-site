@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import DetailPostLayout from "../../layouts/DetailPostLayout.astro";
 
@@ -10,7 +11,7 @@ export async function getStaticPaths() {
 	const projects = await getCollection('projects');
 
 	return projects
-		.filter((entry) => entry.data.draft !== true && !entry.data.detailUrl)
+		.filter((entry) => entry.data.draft !== true)
 		.map((entry) => ({
 			params: { slug: entry.slug },
 			props: { entry },
@@ -22,6 +23,7 @@ const { Content } = await entry.render();
 const publishDate = entry.data.publishDate.toISOString().slice(0, 10);
 const tags = entry.data.tags ?? [];
 const keywords = tags.join(',');
+const gallery = entry.data.gallery?.length ? entry.data.gallery : [];
 ---
 
 <DetailPostLayout
@@ -49,7 +51,7 @@ const keywords = tags.join(',');
 
 			{entry.data.cover && (
 				<div class="project-cover">
-					<img src={entry.data.cover} alt={entry.data.title} loading="lazy" />
+					<Image src={entry.data.cover} alt={entry.data.title} loading="lazy" />
 				</div>
 			)}
 
@@ -58,6 +60,18 @@ const keywords = tags.join(',');
 					<Content />
 				</div>
 			</section>
+
+			{gallery.length > 0 && (
+				<section class="project-gallery" aria-label="Project gallery">
+					{gallery.map((figure) => {
+						return (
+							<div class="project-gallery__item">
+								<Image src={figure} alt={entry.data.title} loading="lazy" />
+							</div>
+						);
+					})}
+				</section>
+			)}
 
 			{entry.data.externalUrl && (
 				<div class="project-actions">
@@ -139,6 +153,24 @@ const keywords = tags.join(',');
 		display: flex;
 		justify-content: center;
 		margin-top: 2rem;
+	}
+
+	.project-gallery {
+		display: grid;
+		gap: 1rem;
+		margin-top: 2rem;
+	}
+
+	.project-gallery__item {
+		border-radius: 18px;
+		overflow: hidden;
+		border: 1px solid var(--border);
+	}
+
+	.project-gallery__item :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
 	}
 
 	.project-cta {

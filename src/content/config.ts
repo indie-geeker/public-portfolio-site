@@ -17,17 +17,16 @@ const blogCollection =  defineCollection({
 
 const projectsCollection = defineCollection({
 		type: 'content',
-		schema: z.object({
+		schema: ({ image }) => z.object({
 			title: z.string(),
 			title_en: z.string().optional(),
 			description: z.string(),
 			publishDate: z.coerce.date(),
 			status: z.string().optional(),
 			tags: z.array(z.string()).optional().default([]),
-			cover: z.string(),
-			gallery: z.array(z.string()).optional().default([]),
+			cover: image(),
+			gallery: z.array(image()).optional().default([]),
 			externalUrl: z.string().url().optional(),
-			detailUrl: z.string().optional(),
 			featured: z.boolean().optional().default(false),
 			featuredOrder: z.number().int().optional(),
 			draft: z.boolean().optional().default(false),
