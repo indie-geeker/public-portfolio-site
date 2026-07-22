@@ -1,0 +1,77 @@
+---
+import LocalizedText from './LocalizedText.astro';
+
+interface Props {
+  eyebrow: string;
+  titleZh: string;
+  titleEn: string;
+  descriptionZh: string;
+  descriptionEn: string;
+}
+
+const { eyebrow, titleZh, titleEn, descriptionZh, descriptionEn } = Astro.props;
+---
+
+<header class="page-intro">
+  <p class="page-intro__eyebrow font-type">{eyebrow}</p>
+  <h1><LocalizedText zh={titleZh} en={titleEn} /></h1>
+  <p class="page-intro__description"><LocalizedText zh={descriptionZh} en={descriptionEn} /></p>
+  <div class="page-intro__rule" aria-hidden="true"><span></span></div>
+</header>
+
+<style>
+  .page-intro {
+    padding: clamp(3.5rem, 8vw, 7rem) 0 clamp(2rem, 5vw, 4rem);
+  }
+
+  .page-intro__eyebrow {
+    margin: 0 0 1rem;
+    color: var(--color-400);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  h1 {
+    max-width: 14ch;
+    margin: 0;
+    color: var(--color-100);
+    font-size: var(--font-size-page-title);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    text-align: left;
+    text-wrap: balance;
+  }
+
+  :global(html[data-locale='zh-CN']) h1 {
+    max-width: 100%;
+    font-size: var(--font-size-page-title-zh);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+  }
+
+  .page-intro__description {
+    max-width: 44rem;
+    margin: 1.5rem 0 0;
+    color: var(--color-300);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.75;
+  }
+
+  .page-intro__rule {
+    position: relative;
+    height: 1px;
+    margin-top: clamp(2.5rem, 6vw, 4.5rem);
+    background: var(--border);
+  }
+
+  .page-intro__rule span {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: min(10rem, 28vw);
+    height: 5px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-primary-main), var(--color-purple));
+  }
+</style>

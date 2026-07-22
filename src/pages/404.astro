@@ -1,38 +1,28 @@
 ---
-import BlogPostLayout from "../layouts/BlogPostLayout.astro";
-import CallToAction from "../components/CallToAction.astro";
-import { notFoundTdk } from  "../data/content"
+import BlogPostLayout from '../layouts/BlogPostLayout.astro';
+import LocalizedText from '../components/LocalizedText.astro';
+import { notFoundTdk } from '../data/content';
 ---
+
 <BlogPostLayout
-	title={notFoundTdk.title  || ''}
-	description= {notFoundTdk.description  || ''}
-	keywords = {notFoundTdk.keywords  || ''}
+  title={notFoundTdk.title || ''}
+  titleEn={notFoundTdk.titleEn || ''}
+  description={notFoundTdk.description || ''}
+  descriptionEn={notFoundTdk.descriptionEn || ''}
+  keywords={notFoundTdk.keywords || ''}
 >
-	<div class="post">
-		<main class="post-wrapper 404">
-			<section>
-				<div class="content">
-					<p class="man">
-						<img src="/assets/404-status.svg" alt="">
-					</p>
-					<p class="text">
-						404 Not Found<br/>
-						这里什么都没有。
-					</p>
-					<div class="btn">
-						<CallToAction href="/" target="_self">
-								返回主页
-						</CallToAction>
-					</div>
-				</div>
-			</section>
-		</main>
-	</div>
+  <main class="missing-page">
+    <p class="missing-page__code" aria-hidden="true">404</p>
+    <h1><LocalizedText zh="这里没有这个页面" en="This page wandered off" /></h1>
+    <p><LocalizedText zh="链接可能已经移动，或者这个占位页面还没有开始构建。" en="The link may have moved, or this placeholder page has not been built yet." /></p>
+    <a href="/"><LocalizedText zh="返回主页" en="Back to home" /> →</a>
+  </main>
 </BlogPostLayout>
 
 <style>
-body{min-height: 100vh;}
-.man{margin-bottom: 0;}
-p{text-align: center;}
-.btn{margin:2rem auto 4em;text-align:center;}
+  .missing-page { display: grid; justify-items: center; min-height: 64vh; padding: clamp(5rem, 12vw, 9rem) 1rem; text-align: center; }
+  .missing-page__code { margin: 0; color: var(--color-primary-main); font-family: var(--font-type); font-size: .8rem; font-weight: 700; letter-spacing: .2em; }
+  h1 { max-width: 12ch; margin: 1rem auto 0; font-size: clamp(2.5rem, 8vw, 5.5rem); line-height: 1; }
+  .missing-page > p:not(.missing-page__code) { max-width: 36rem; margin: 1.25rem auto 0; color: var(--color-400); line-height: 1.75; text-align: center; }
+  a { margin-top: 2rem; padding: .9rem 1.2rem; border: 1px solid var(--border); border-radius: 999px; color: var(--color-100); font-weight: 700; }
 </style>

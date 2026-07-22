@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import { featuredProductsIntro } from '../../data/homepage';
-import { isExternalHref } from '../../data/site-utils';
+import LocalizedText from '../LocalizedText.astro';
 
 interface Props {
   projects: CollectionEntry<'projects'>[];
@@ -15,39 +15,41 @@ const { projects } = Astro.props;
   <div class="featured-products__header">
     <div>
       <p class="featured-products__eyebrow font-type">{featuredProductsIntro.eyebrow}</p>
-      <h2 id="featured-products-heading">{featuredProductsIntro.title}</h2>
-      <p>{featuredProductsIntro.description}</p>
+      <h2 id="featured-products-heading"><LocalizedText zh={featuredProductsIntro.title} en={featuredProductsIntro.titleEn} /></h2>
+      <p><LocalizedText zh={featuredProductsIntro.description} en={featuredProductsIntro.descriptionEn} /></p>
+      <p class="featured-products__disclosure">
+        <strong><LocalizedText zh="概念占位" en="Concept placeholder" /></strong>
+        <LocalizedText zh="：当前内容用于展示最终产品页的信息结构，不代表正式发布。" en=": current entries demonstrate the intended product-page structure and are not formal launches." />
+      </p>
     </div>
-    <a href="/project" class="featured-products__link">查看全部产品</a>
+    <a href="/project" class="featured-products__link"><LocalizedText zh="查看全部产品" en="View the project lab" /></a>
   </div>
   <div class="featured-products__grid">
     {projects.map((project) => {
-      const href = project.data.externalUrl || `/detail/${project.slug}`;
-      const isExternalLink = isExternalHref(href);
-      const status = project.data.status || '查看详情';
+      const href = `/detail/${project.slug}`;
+      const status = project.data.status || '概念占位';
+      const statusEn = project.data.status_en || 'Concept placeholder';
 
       return (
         <a 
           href={href}
           class="featured-card" 
           style={`--featured-accent: var(--color-primary-main);`}
-          target={isExternalLink ? '_blank' : undefined}
-          rel={isExternalLink ? 'noreferrer' : undefined}
         >
           <div class="featured-card__cover">
-            <Image src={project.data.cover} alt={project.data.title} loading="lazy" />
+            <Image src={project.data.cover} alt={`${project.data.title_en || project.data.title} / ${project.data.title}`} loading="lazy" />
           </div>
           <div class="featured-card__body">
             <div class="featured-card__meta">
-              <span class="featured-card__status">{status}</span>
+              <span class="featured-card__status"><LocalizedText zh={status} en={statusEn} /></span>
               <div class="featured-card__tags">
-                {project.data.tags.map((tag) => <span>{tag}</span>)}
+                {project.data.tags.slice(0, 2).map((tag, index) => <span><LocalizedText zh={tag} en={project.data.tags_en[index] || tag} /></span>)}
               </div>
             </div>
-            <h3>{project.data.title}</h3>
-            <p>{project.data.description}</p>
+            <h3><LocalizedText zh={project.data.title} en={project.data.title_en || project.data.title} /></h3>
+            <p><LocalizedText zh={project.data.description} en={project.data.description_en || project.data.description} /></p>
             <span class="featured-card__link">
-              {project.data.externalUrl ? '立即体验' : '查看详情'}
+              <LocalizedText zh="查看概念详情" en="View concept details" />
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </span>
           </div>
@@ -79,7 +81,7 @@ const { projects } = Astro.props;
 
   .featured-products__header h2 {
     margin: 0;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: var(--font-size-section-title);
     color: var(--color-100);
   }
 
@@ -87,6 +89,14 @@ const { projects } = Astro.props;
     margin: 0.8rem 0 0;
     line-height: 1.75;
     color: var(--color-300);
+  }
+
+  .featured-products__header .featured-products__disclosure {
+    margin-top: 1rem;
+    padding-left: 0.85rem;
+    border-left: 2px solid var(--color-primary-main);
+    color: var(--color-400);
+    font-size: 0.88rem;
   }
 
   .featured-products__link {

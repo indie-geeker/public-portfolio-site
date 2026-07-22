@@ -69,6 +69,8 @@ test('project index includes collection-backed live products', () => {
   assert.match(html, /UIUX 设计工具(?:&|&amp;)资源库/);
   assert.match(html, /Rico OG Gallery/);
   assert.match(html, /detail\/gradientshub/);
+  assert.match(html, /A curated premium gradient background library/);
+  assert.match(html, /Concept project/);
 });
 
 test('build generates a detail page for the gradientshub project entry', () => {
@@ -77,6 +79,8 @@ test('build generates a detail page for the gradientshub project entry', () => {
   const html = readFileSync(gradientsHubDetailPath, 'utf8');
   assert.match(html, /GradientsHub/);
   assert.match(html, /立即体验|访问站点/);
+  assert.match(html, /Visit product/);
+  assert.match(html, /Case study placeholder/);
 });
 
 test('legacy project detail entries are served by the dynamic route without compatibility fields', () => {

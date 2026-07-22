@@ -1,0 +1,75 @@
+<div class="locale-toggle" role="group" aria-label="语言 / Language">
+  <button type="button" data-locale-option="zh-CN" aria-pressed="false">中</button>
+  <span aria-hidden="true">/</span>
+  <button type="button" data-locale-option="en" aria-pressed="true">EN</button>
+</div>
+
+<script>
+  declare global {
+    interface Window {
+      __setSiteLocale?: (locale: 'zh-CN' | 'en', persist?: boolean) => void;
+    }
+  }
+
+  const syncLocaleButtons = () => {
+    const activeLocale = document.documentElement.dataset.locale || 'en';
+    document.querySelectorAll<HTMLButtonElement>('[data-locale-option]').forEach((button) => {
+      const isActive = button.dataset.localeOption === activeLocale;
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+  };
+
+  const initLocaleToggle = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-locale-option]').forEach((button) => {
+      if (button.dataset.localeBound === 'true') return;
+      button.dataset.localeBound = 'true';
+      button.addEventListener('click', () => {
+        const locale = button.dataset.localeOption === 'zh-CN' ? 'zh-CN' : 'en';
+        window.__setSiteLocale?.(locale, true);
+      });
+    });
+    syncLocaleButtons();
+  };
+
+  document.addEventListener('site:locale-change', syncLocaleButtons);
+  document.addEventListener('astro:page-load', initLocaleToggle);
+  initLocaleToggle();
+</script>
+
+<style>
+  .locale-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 40px;
+    padding: 0 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--color-500);
+    background: color-mix(in srgb, var(--color-999) 82%, transparent);
+    font-family: var(--font-brand);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  button {
+    min-width: 2rem;
+    min-height: 2rem;
+    border: 0;
+    border-radius: 999px;
+    color: var(--color-400);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  button[aria-pressed='true'] {
+    color: var(--color-100);
+    background: var(--color-800);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--color-primary-main);
+    outline-offset: 2px;
+  }
+</style>

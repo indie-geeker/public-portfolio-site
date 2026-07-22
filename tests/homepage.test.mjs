@@ -8,6 +8,8 @@ const cwd = process.cwd();
 const distDir = join(cwd, 'dist');
 const homepagePath = join(distDir, 'index.html');
 const aboutPagePath = join(distDir, 'about', 'index.html');
+const heroSourcePath = join(cwd, 'src', 'components', 'home', 'Hero.astro');
+const navSourcePath = join(cwd, 'src', 'components', 'Nav.astro');
 const editorialFixtureSlug = 'featured-articles-order-fixture';
 const editorialFixtureSourcePath = join(
   cwd,
@@ -70,6 +72,86 @@ test('homepage build includes product-led hero and follow section', () => {
   assert.match(html, /window\.scrollY/);
   assert.match(html, /document\.body\.scrollTop/);
   assert.match(html, /hero-overlap/);
+});
+
+test('homepage hero viewport sizing compensates for its navigation overlap', () => {
+  const heroSource = readFileSync(heroSourcePath, 'utf8');
+
+  assert.match(
+    heroSource,
+    /min-height:\s*calc\(100vh \+ var\(--hero-overlap\) - var\(--size-top, 64px\)\)/,
+  );
+  assert.match(
+    heroSource,
+    /min-height:\s*calc\(100svh \+ var\(--hero-overlap\) - var\(--size-top, 64px\)\)/,
+  );
+});
+
+test('navigation box uses the shared top-size token at every viewport', () => {
+  const navSource = readFileSync(navSourcePath, 'utf8');
+
+  assert.match(
+    navSource,
+    /nav\s*\{[\s\S]*?min-height:\s*var\(--size-top, 64px\);[\s\S]*?display:\s*flex;/,
+  );
+  assert.match(navSource, /\.nav-wrapper\s*\{[\s\S]*?width:\s*100%;/);
+});
+
+test('homepage identity typewriter advances without deleting the display line to empty', () => {
+  const heroSource = readFileSync(heroSourcePath, 'utf8');
+  const classMatch = heroSource.match(
+    /class Typewriter\s*\{[\s\S]*?\n  \}\n\n  const initHeroBehavior/,
+  );
+
+  assert.ok(classMatch, 'expected the inline Typewriter class to be present');
+  const classSource = classMatch[0].replace(/\n\n  const initHeroBehavior$/, '');
+  const Typewriter = Function(`${classSource}; return Typewriter;`)();
+  const scheduled = [];
+  const cleared = [];
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const originalSetInterval = globalThis.setInterval;
+  const originalClearInterval = globalThis.clearInterval;
+
+  globalThis.setTimeout = (callback, delay) => {
+    const id = scheduled.length + 1;
+    scheduled.push({ id, callback, delay });
+    return id;
+  };
+  globalThis.clearTimeout = (id) => cleared.push(id);
+  globalThis.setInterval = globalThis.setTimeout;
+  globalThis.clearInterval = globalThis.clearTimeout;
+
+  try {
+    const span = { textContent: '' };
+    const typewriter = new Typewriter(span, ['AB', 'CD'], 2500);
+
+    assert.equal(span.textContent, 'A');
+    let task = scheduled.shift();
+    assert.equal(task.delay, 100);
+
+    task.callback();
+    assert.equal(span.textContent, 'AB');
+    task = scheduled.shift();
+    assert.equal(task.delay, 2500);
+
+    task.callback();
+    assert.equal(span.textContent, 'A');
+    task = scheduled.shift();
+    assert.equal(task.delay, 500);
+
+    task.callback();
+    assert.equal(span.textContent, 'C');
+
+    typewriter.setWords(['XY']);
+    assert.equal(span.textContent, 'X');
+    assert.ok(cleared.length > 0);
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+    globalThis.setInterval = originalSetInterval;
+    globalThis.clearInterval = originalClearInterval;
+  }
 });
 
 test('homepage featured articles prefer explicit featured entries over newer fallback posts', () => {

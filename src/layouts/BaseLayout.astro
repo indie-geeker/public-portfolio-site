@@ -5,19 +5,24 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 interface Props {
 	title?: string | undefined;
+	titleEn?: string | undefined;
 	description?: string | undefined;
+	descriptionEn?: string | undefined;
 	keywords?: string | undefined;
 }
-const { title, description,keywords } = Astro.props;
+const { title, titleEn, description, descriptionEn, keywords } = Astro.props;
 ---
-<html lang=en>
+<html lang="en" data-locale="en">
 	<head>
-		<MainHead title={title} description={description}  keywords={keywords} />
+		<MainHead title={title} titleEn={titleEn} description={description} descriptionEn={descriptionEn} keywords={keywords} />
 	</head>
 	<body class="_body">
+		<a class="skip-link" href="#main-content">跳到主要内容 / Skip to content</a>
 		<div class="">
 			<Nav transition:persist/>
-			<slot />
+			<main id="main-content" tabindex="-1">
+				<slot />
+			</main>
 			<Footer />
 		</div>
 

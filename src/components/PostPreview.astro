@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatIsoDate } from '../data/site-utils';
+import LocalizedText from './LocalizedText.astro';
 
 interface Props {
 	post: CollectionEntry<'blog'>;
@@ -13,7 +14,7 @@ const tags = data.tags?.slice(0, 3) ?? [];
 <a href={`/blog/${slug}`} class="post-item border-bottom">
 	<div class="post-title">
 		<h3>
-			{data.title}
+			<LocalizedText zh={data.title} en={data.title_en || data.title} />
 		</h3>
 		<div class="post-meta">
 			<span class="publish-date">
@@ -21,7 +22,7 @@ const tags = data.tags?.slice(0, 3) ?? [];
 			</span>
 			{data.read && <span class="post-read">{data.read} min</span>}
 		</div>
-		{data.description && <p class="post-desc">{data.description}</p>}
+		{data.description && <p class="post-desc"><LocalizedText zh={data.description} en={data.description_en || data.description} /></p>}
 		{tags.length > 0 && (
 			<div class="post-tags">
 				{tags.map((tag) => <span>{tag}</span>)}

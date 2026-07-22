@@ -14,7 +14,9 @@ const featuredPosts = await getFeaturedBlogPosts(3);
 
 <BaseLayout
 title={homeTdk.title || ''}
+titleEn={homeTdk.titleEn || ''}
 description={homeTdk.description || ''}
+descriptionEn={homeTdk.descriptionEn || ''}
 keywords={homeTdk.keywords || ''}
 >
   <Hero />
@@ -29,13 +31,11 @@ keywords={homeTdk.keywords || ''}
     </div>
   </section>
 
-  {featuredPosts.length > 0 && (
-    <section class="home-section" id="updates" aria-labelledby="latest-notes-heading">
-      <div class="container">
-        <LatestNotes posts={featuredPosts} />
-      </div>
-    </section>
-  )}
+  <section class="home-section" id="updates" aria-labelledby="latest-notes-heading">
+    <div class="container">
+      <LatestNotes posts={featuredPosts} />
+    </div>
+  </section>
 
   <section class="home-section" aria-labelledby="mini-about-heading">
     <div class="container">
@@ -52,6 +52,6 @@ keywords={homeTdk.keywords || ''}
 
 <style lang="scss">
   .home-section {
-    padding: 1.5rem 0;
+    padding: var(--space-home-section) 0;
   }
 </style>

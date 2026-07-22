@@ -4,24 +4,75 @@ import '../styles/layout.scss';
 import '../styles/global.scss';
 interface Props {
 	title?: string | undefined;
+	titleEn?: string | undefined;
 	description?: string | undefined;
+	descriptionEn?: string | undefined;
 	keywords?: string | undefined;
 }
-const { title, description,keywords } = Astro.props;
+const { title, titleEn = title, description, descriptionEn = description, keywords } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const previewUrl = new URL('/preview.jpg', Astro.site);
 ---
 
 <meta charset="UTF-8" />
-<meta name="description" property="og:description" content={description} />
+<meta name="description" content={descriptionEn} data-meta-zh={description} data-meta-en={descriptionEn} />
 <meta name="keywords" content={keywords} />
+<link rel="canonical" href={canonicalUrl} />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link rel="alternate" type="application/rss+xml" title={title} href={new URL("rss.xml", Astro.site)} />
 
+<meta property="og:type" content="website" />
+<meta property="og:title" content={titleEn} data-meta-zh={title} data-meta-en={titleEn} />
+<meta property="og:description" content={descriptionEn} data-meta-zh={description} data-meta-en={descriptionEn} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={previewUrl} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={titleEn} data-meta-zh={title} data-meta-en={titleEn} />
+<meta name="twitter:description" content={descriptionEn} data-meta-zh={description} data-meta-en={descriptionEn} />
+<meta name="twitter:image" content={previewUrl} />
+
 <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content={Astro.generator} />
-<title>{title}</title>
+<title data-title-zh={title} data-title-en={titleEn}>{titleEn}</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
 <script is:inline>
+	const localeStorageKey = 'site-locale';
+	const chinaTimezones = new Set(['Asia/Shanghai', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Urumqi']);
+	const readStoredLocale = () => {
+		try {
+			const stored = localStorage.getItem(localeStorageKey);
+			return stored === 'zh-CN' || stored === 'en' ? stored : null;
+		} catch {
+			return null;
+		}
+	};
+	const detectInitialLocale = () => {
+		const stored = readStoredLocale();
+		if (stored) return stored;
+		const countryCode = document.documentElement.dataset.countryCode || '';
+		const browserLanguage = navigator.language || '';
+		const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+		const isMainlandChina = countryCode.toUpperCase() === 'CN' || browserLanguage.toLowerCase() === 'zh-cn' || chinaTimezones.has(timezone);
+		return isMainlandChina ? 'zh-CN' : 'en';
+	};
+	const applySiteLocale = (locale, persist = false) => {
+		const normalizedLocale = locale === 'zh-CN' ? 'zh-CN' : 'en';
+		document.documentElement.lang = normalizedLocale;
+		document.documentElement.dataset.locale = normalizedLocale;
+		const title = document.querySelector('title');
+		if (title) title.textContent = normalizedLocale === 'zh-CN' ? title.dataset.titleZh : title.dataset.titleEn;
+		document.querySelectorAll('[data-meta-zh][data-meta-en]').forEach((meta) => {
+			meta.setAttribute('content', normalizedLocale === 'zh-CN' ? meta.dataset.metaZh : meta.dataset.metaEn);
+		});
+		if (persist) {
+			try { localStorage.setItem(localeStorageKey, normalizedLocale); } catch { /* private browsing */ }
+		}
+		document.dispatchEvent(new CustomEvent('site:locale-change', { detail: { locale: normalizedLocale } }));
+	};
+	window.__setSiteLocale = applySiteLocale;
+	applySiteLocale(detectInitialLocale());
+
 	const getThemePreference = () => {
 		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
 			return localStorage.getItem('theme');

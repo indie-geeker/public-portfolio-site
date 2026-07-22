@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { latestNotesIntro } from '../../data/homepage';
 import { formatIsoDate } from '../../data/site-utils';
+import LocalizedText from '../LocalizedText.astro';
 
 interface Props {
   posts: CollectionEntry<'blog'>[];
@@ -14,10 +15,10 @@ const { posts } = Astro.props;
   <div class="latest-notes__header">
     <div>
       <p class="latest-notes__eyebrow font-type">{latestNotesIntro.eyebrow}</p>
-      <h2 id="latest-notes-heading">{latestNotesIntro.title}</h2>
-      <p>{latestNotesIntro.description}</p>
+      <h2 id="latest-notes-heading"><LocalizedText zh={latestNotesIntro.title} en={latestNotesIntro.titleEn} /></h2>
+      <p><LocalizedText zh={latestNotesIntro.description} en={latestNotesIntro.descriptionEn} /></p>
     </div>
-    <a href="/blog" class="latest-notes__link">查看全部文章</a>
+    <a href="/blog" class="latest-notes__link"><LocalizedText zh="查看全部文章" en="View all writing" /></a>
   </div>
 
   <div class="latest-notes__grid">
@@ -31,8 +32,8 @@ const { posts } = Astro.props;
             <span>{formatIsoDate(post.data.publishDate)}</span>
             {post.data.read && <span>{post.data.read} min</span>}
           </div>
-          <h3>{post.data.title}</h3>
-          <p>{description}</p>
+          <h3><LocalizedText zh={post.data.title} en={post.data.title_en || post.data.title} /></h3>
+          <p><LocalizedText zh={description} en={post.data.description_en || post.data.description || 'A build note from the independent product studio.'} /></p>
           {tags.length > 0 && (
             <div class="latest-note__tags">
               {tags.map((tag) => <span>{tag}</span>)}
@@ -41,6 +42,13 @@ const { posts } = Astro.props;
         </a>
       );
     })}
+    {posts.length === 0 && (
+      <article class="latest-note latest-note--placeholder">
+        <div class="latest-note__meta"><LocalizedText zh="内容占位" en="Content placeholder" /></div>
+        <h3><LocalizedText zh="第一篇构建日志正在准备" en="The first build note is in progress" /></h3>
+        <p><LocalizedText zh="这里将展示文章标题、摘要、阅读时长和标签。" en="This card demonstrates the future title, summary, reading time, and tag layout." /></p>
+      </article>
+    )}
   </div>
 
 </div>
@@ -68,7 +76,7 @@ const { posts } = Astro.props;
 
   .latest-notes__header h2 {
     margin: 0;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: var(--font-size-section-title);
     color: var(--color-100);
   }
 
@@ -104,6 +112,10 @@ const { posts } = Astro.props;
   .latest-note:hover {
     transform: translateY(-2px);
     border-color: var(--color-primary-main);
+  }
+
+  .latest-note--placeholder {
+    border-style: dashed;
   }
 
   .latest-note__meta {

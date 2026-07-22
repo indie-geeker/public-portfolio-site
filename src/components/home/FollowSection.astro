@@ -1,29 +1,25 @@
 ---
 import { followSection } from '../../data/homepage';
+import LocalizedText from '../LocalizedText.astro';
 ---
 
 <div class="follow-section">
   <div class="follow-section__header">
     <p class="follow-section__eyebrow font-type">{followSection.eyebrow}</p>
-    <h2 id="follow-heading">{followSection.title}</h2>
-    <p>{followSection.description}</p>
+    <h2 id="follow-heading"><LocalizedText zh={followSection.title} en={followSection.titleEn} /></h2>
+    <p><LocalizedText zh={followSection.description} en={followSection.descriptionEn} /></p>
   </div>
 
   <div class="follow-section__grid">
     {followSection.entries.map((entry) => (
-      <a
-        href={entry.href}
-        class:list={['follow-entry', { 'follow-entry--placeholder': !entry.external }]}
-        target={entry.external ? '_blank' : undefined}
-        rel={entry.external ? 'noreferrer' : undefined}
-      >
+      <article class="follow-entry follow-entry--placeholder" aria-disabled="true">
         <div class="follow-entry__top">
-          <span class="follow-entry__name">{entry.name}</span>
-          <span class="follow-entry__status">{entry.status}</span>
+          <span class="follow-entry__name"><LocalizedText zh={entry.name} en={entry.nameEn} /></span>
+          <span class="follow-entry__status"><LocalizedText zh={entry.status} en={entry.statusEn} /></span>
         </div>
-        <p class="follow-entry__description">{entry.description}</p>
-        <span class="follow-entry__action">{entry.actionLabel}</span>
-      </a>
+        <p class="follow-entry__description"><LocalizedText zh={entry.description} en={entry.descriptionEn} /></p>
+        <span class="follow-entry__action"><LocalizedText zh={entry.actionLabel} en={entry.actionLabelEn} /></span>
+      </article>
     ))}
   </div>
 </div>
@@ -55,7 +51,7 @@ import { followSection } from '../../data/homepage';
   .follow-section__header h2 {
     margin: 0;
     color: var(--color-100);
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: var(--font-size-section-title);
   }
 
   .follow-section__header p {

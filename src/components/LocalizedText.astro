@@ -1,0 +1,14 @@
+---
+interface Props {
+  zh: string;
+  en: string;
+  class?: string;
+}
+
+const { zh, en, class: className } = Astro.props;
+---
+
+<span class={className}>
+  <span data-locale-copy="zh-CN" lang="zh-CN">{zh}</span>
+  <span data-locale-copy="en" lang="en">{en}</span>
+</span>

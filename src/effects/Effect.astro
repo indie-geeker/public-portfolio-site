@@ -7,6 +7,12 @@
 
 		const canvas = document.querySelector('.particle-canvas');
 		if (!canvas) return;
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const usesCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+		if (prefersReducedMotion || usesCoarsePointer) {
+			canvas.hidden = true;
+			return;
+		}
 		
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -29,6 +35,7 @@
 		setCanvasSize();
 
 		let particles = [];
+		let animationFrameId = 0;
 		let pointer = { ...inactivePointer };
 		let mouse = { ...inactivePointer };
 		let lastMouse = { ...inactivePointer };
@@ -105,6 +112,9 @@
 				let iy = lastMouse.y + dy * (i / count);
 				particles.push(new Particle(ix, iy, dx, dy));
 			}
+			if (!animationFrameId && particles.length > 0) {
+				animationFrameId = requestAnimationFrame(render);
+			}
 		};
 
 		window.addEventListener('mousemove', updateMouse);
@@ -160,11 +170,13 @@
 			}
 			
 			ctx.globalCompositeOperation = 'source-over';
-			requestAnimationFrame(render);
+			if (particles.length === 0) {
+				animationFrameId = 0;
+				return;
+			}
+			animationFrameId = requestAnimationFrame(render);
 		}
 		
-		// Start animation loop
-		render();
 		syncParticleGate();
 		document.addEventListener('astro:page-load', syncParticleGate);
 		window.addEventListener('scroll', syncParticleGate, { passive: true });
@@ -195,6 +207,12 @@
 
 /* Hide on mobile devices generally to save performance and prevent UX issues */
 @media (max-width: 768px) {
+	.particle-canvas {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
 	.particle-canvas {
 		display: none;
 	}

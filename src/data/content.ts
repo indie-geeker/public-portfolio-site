@@ -5,6 +5,7 @@ export const siteConfig = {
 
 interface NavItem {
 	label: string;
+	labelEn: string;
 	href: string;
 	target?: string; // target是可选的，默认为_self或不指定
 }
@@ -18,10 +19,10 @@ interface Nav {
 export const nav: Nav = {
 	avatar: '/assets/author.jpg',
 	items: [
-		{ label: '首页', href: '/', target: '_self' },// target 为 '_blank' 打开新链接
-		{ label: '产品', href: '/project', target: '_self' },
-		{ label: '文章', href: '/blog', target: '_self' },
-		{ label: '关于', href: '/about', target: '_self' },
+		{ label: '首页', labelEn: 'Home', href: '/', target: '_self' },// target 为 '_blank' 打开新链接
+		{ label: '产品', labelEn: 'Products', href: '/project', target: '_self' },
+		{ label: '文章', labelEn: 'Writing', href: '/blog', target: '_self' },
+		{ label: '关于', labelEn: 'About', href: '/about', target: '_self' },
 	],
 };
 
@@ -31,37 +32,49 @@ export const footerText = `© ${new Date().getFullYear()} IndieGeeker. All Right
 //SEO TDK
 interface SeoTdk {
 	title?: string
+	titleEn?: string
 	description?: string
+	descriptionEn?: string
 	keywords?: string
 }
 // SEO TDK 首页
 export const homeTdk: SeoTdk = {
 	title: '独立极客',
+	titleEn: 'IndieGeeker — Independent product studio',
 	description: '独立开发者产品实验室，持续发布数字产品、设计资源与创意实验。',
+	descriptionEn: 'An independent product lab for digital tools, design resources, and creative experiments.',
 	keywords: '独立极客,独立开发者,产品,设计资源,创意实验'
 }
 // SEO TDK 博客
 export const blogTdk: SeoTdk = {
 	title: '独立极客的更新',
+	titleEn: 'Writing & notes — IndieGeeker',
 	description: '记录产品发布、版本迭代和创意实验的公开构建过程。',
+	descriptionEn: 'Build notes about product releases, iterations, and creative experiments.',
 	keywords: '独立极客,更新,产品日志,build in public'
 }
 // SEO TDK 关于
 export const aboutTdk: SeoTdk = {
 	title: '关于独立极客',
+	titleEn: 'About — IndieGeeker',
 	description: '关于独立极客的品牌、产品方向与创作方式。',
+	descriptionEn: 'The direction, working principles, and product practice behind IndieGeeker.',
 	keywords: '独立极客,独立开发者,关于'
 }
 // SEO TDK  项目
 export const projectTdk: SeoTdk = {
 	title: '独立极客的产品库',
+	titleEn: 'Project lab — IndieGeeker',
 	description: '查看独立极客正在构建和维护的产品、资源与实验。',
+	descriptionEn: 'Explore products, resources, and experiments being shaped at IndieGeeker.',
 	keywords: '独立极客,产品,资源,实验'
 }
 // SEO TDK 404
 export const notFoundTdk: SeoTdk = {
 	title: '404 Not Found - 这里什么都没有。',
+	titleEn: '404 — Page not found',
 	description: '404 Not Found - 这里什么都没有。',
+	descriptionEn: 'The requested page could not be found.',
 	keywords: '404 Not Found. 这里什么都没有。'
 }
 
@@ -160,4 +173,3 @@ export const filterItems: FilterItem[] = [
 	{ content: "灵感", dataGroup: "inspiration" },
 	{ content: "实验", dataGroup: "experiment" },
 ];
-

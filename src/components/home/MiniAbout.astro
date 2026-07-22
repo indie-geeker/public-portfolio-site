@@ -1,15 +1,16 @@
 ---
 import { miniAbout } from '../../data/homepage';
+import LocalizedText from '../LocalizedText.astro';
 ---
 
 <div class="mini-about">
   <p class="mini-about__eyebrow font-type">{miniAbout.eyebrow}</p>
   <div class="mini-about__content">
     <div>
-      <h2 id="mini-about-heading">{miniAbout.title}</h2>
-      <p>{miniAbout.description}</p>
+      <h2 id="mini-about-heading"><LocalizedText zh={miniAbout.title} en={miniAbout.titleEn} /></h2>
+      <p><LocalizedText zh={miniAbout.description} en={miniAbout.descriptionEn} /></p>
     </div>
-    <a href={miniAbout.href} class="mini-about__link">{miniAbout.label}</a>
+    <a href={miniAbout.href} class="mini-about__link"><LocalizedText zh={miniAbout.label} en={miniAbout.labelEn} /></a>
   </div>
 </div>
 
@@ -45,7 +46,7 @@ import { miniAbout } from '../../data/homepage';
 
   .mini-about h2 {
     margin: 0;
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: var(--font-size-section-title);
     color: var(--color-100);
   }
 

@@ -1,0 +1,58 @@
+---
+import LocalizedText from './LocalizedText.astro';
+
+interface Props {
+  titleZh: string;
+  titleEn: string;
+  descriptionZh: string;
+  descriptionEn: string;
+  labelZh?: string;
+  labelEn?: string;
+}
+
+const {
+  titleZh,
+  titleEn,
+  descriptionZh,
+  descriptionEn,
+  labelZh = '概念占位',
+  labelEn = 'Concept placeholder',
+} = Astro.props;
+---
+
+<article class="placeholder-panel">
+  <span class="placeholder-panel__label"><LocalizedText zh={labelZh} en={labelEn} /></span>
+  <h2><LocalizedText zh={titleZh} en={titleEn} /></h2>
+  <p><LocalizedText zh={descriptionZh} en={descriptionEn} /></p>
+  <div class="placeholder-panel__skeleton" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+</article>
+
+<style>
+  .placeholder-panel {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.35rem, 3vw, 2rem);
+    border: 1px dashed color-mix(in srgb, var(--color-primary-main) 45%, var(--border));
+    border-radius: 24px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-main) 7%, transparent), transparent 60%);
+  }
+
+  .placeholder-panel__label {
+    display: inline-flex;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--color-400);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  h2 { margin: 1rem 0 0; font-size: clamp(1.4rem, 3vw, 2rem); }
+  p { max-width: 42rem; margin: 0.75rem 0 0; color: var(--color-300); line-height: 1.75; }
+  .placeholder-panel__skeleton { display: grid; gap: 0.5rem; width: min(20rem, 65%); margin-top: 1.5rem; }
+  .placeholder-panel__skeleton span { height: 0.42rem; border-radius: 999px; background: var(--border); }
+  .placeholder-panel__skeleton span:nth-child(2) { width: 76%; }
+  .placeholder-panel__skeleton span:nth-child(3) { width: 52%; }
+</style>
